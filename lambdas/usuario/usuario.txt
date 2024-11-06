@@ -1,0 +1,10 @@
+{
+    "tenant_id": "1234567890",
+    "user_id": "1234567890",
+    "password": "1234567890",
+    "user_info": {
+        "name": "John Doe",
+        "phone": "1234567890",
+        "address": "1234 Main St, Anytown, USA"
+    }
+}

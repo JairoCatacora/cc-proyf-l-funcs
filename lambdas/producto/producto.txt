@@ -1,0 +1,16 @@
+{
+    "tenant_id": "1234567890",
+    "product_id": "1234567890",
+    "product_info": {
+        "name": "Producto 1",
+        "category": "Electronics",
+        "price": 10.99,
+        "image": "https://example.com/product1.jpg",
+        "detalles": {              <----- Los detales pueden cambiar segun el producto
+            "color": "Blanco",
+            "size": "Medium",
+            "material": "Aluminio",
+            "description": "Este es un producto de ejemplo"
+        }
+    }
+}
