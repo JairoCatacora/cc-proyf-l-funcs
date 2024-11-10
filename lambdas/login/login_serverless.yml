@@ -1,0 +1,42 @@
+org: fruit
+service: api-s3
+
+provider:
+  name: aws
+  runtime: python3.12	
+  # Default memory size for functions (default: 256MB)
+  memorySize: 256
+  timeout: 30
+  iam:
+    role: arn:aws:iam::943073974505:role/LabRole
+
+functions:
+  crear_usuario:
+    handler: crear_usuario.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /user/register
+          method: post
+          cors: true
+          integration: lambda
+
+  login_usuario:
+    handler: login_usuario.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /user/login
+          method: post
+          cors: true
+          integration: lambda
+
+  validar_token:
+    handler: validar_token.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /user/validate-token
+          method: post
+          cors: true
+          integration: lambda
