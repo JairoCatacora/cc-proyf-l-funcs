@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-exports.lambda_handler = async (event) => {
+exports.handler = async (event) => {
     const { tenant_id, product_id } = event.pathParameters;
 
     const params = {
