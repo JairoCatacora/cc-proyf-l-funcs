@@ -9,6 +9,12 @@ def hash_password(password):
 # Función que maneja el registro de user y validación del password
 def lambda_handler(event, context):
     try:
+        # Convertir el cuerpo a JSON si es una cadena
+        if isinstance(event.get('body'), str):
+            body = json.loads(event['body'])
+        else:
+            body = event
+            
         # Obtener el email y el password
         user_id = event.get('user_id')
         password = event.get('password')
