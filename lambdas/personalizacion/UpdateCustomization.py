@@ -27,7 +27,7 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Customization updated', 'updatedAttributes': response['Attributes']})
+            'body': json.dumps({'message': 'Personalizacion actualizada', 'updatedAttributes': response['Attributes']})
         }
     except Exception as e:
         print(str(e))
