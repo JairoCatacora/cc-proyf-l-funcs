@@ -1,0 +1,11 @@
+{
+  "tenant_id": "bestbuy",
+  "logo_url": "/assets/logos/bestbuy.svg",
+  "color_palette": {
+    "primary": "#0046be",
+    "secondary": "#ffca28",
+    "background": "#ffffff",
+  },
+  "currency": "USD",
+  "timezone": "GMT-5"
+}
