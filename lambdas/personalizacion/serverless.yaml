@@ -1,0 +1,75 @@
+org: fruit
+service: api-customization
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 256
+  timeout: 30
+  iam:
+    role: arn:aws:iam::943073974505:role/LabRole
+
+  environment:
+    BUCKET_NAME: dev-multishop-logos
+
+functions:
+  # GET /customization/{tenant_id}
+  getCustomization:
+    handler: get_customization.handler
+    events:
+      - http:
+          path: /customization/{tenant_id}
+          method: get
+          cors: true
+          integration: lambda
+
+  # PATCH /customization/{tenant_id}
+  updateCustomization:
+    handler: update_customization.lambda_handler
+    events:
+      - http:
+          path: /customization/{tenant_id}
+          method: patch
+          cors: true
+          integration: lambda
+
+  # POST /customization
+  createCustomization:
+    handler: create_customization.lambda_handler
+    events:
+      - http:
+          path: /customization
+          method: post
+          cors: true
+          integration: lambda
+
+  # DELETE /customization/{tenant_id}
+  deleteCustomization:
+    handler: delete_customization.handler
+    events:
+      - http:
+          path: /customization/{tenant_id}
+          method: delete
+          cors: true
+          integration: lambda
+
+  # POST /customization/upload-logo
+  uploadLogo:
+    handler: upload_logo.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /customization/upload-logo
+          method: post
+          cors: true
+          integration: lambda
+
+  # GET /customization/list-logos
+  listTenantLogos:
+    handler: list_tenant_logos.handler
+    events:
+      - http:
+          path: /customization/list-logos
+          method: get
+          cors: true
+          integration: lambda
