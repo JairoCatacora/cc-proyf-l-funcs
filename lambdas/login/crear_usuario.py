@@ -16,8 +16,8 @@ def lambda_handler(event, context):
             body = event
             
         # Obtener el email y el password
-        user_id = event.get('user_id')
-        password = event.get('password')
+        user_id = event['body']['user_id']
+        password = event['body']['password']
         
         # Verificar que el email y el password existen
         if user_id and password:
@@ -27,20 +27,21 @@ def lambda_handler(event, context):
             dynamodb = boto3.resource('dynamodb')
             t_usuarios = dynamodb.Table('t_usuarios')
             # Almacena los datos del user en la tabla de usuarios en DynamoDB
-            t_usuarios.put_item(
-                Item={
-                    'user_id': user_id,
-                    'password': hashed_password,
-                }
-            )
+            usuario = {
+                'user_id': user_id,
+                'password': hashed_password
+            }
+            response = t_usuarios.put_item(Item=usuarios)
             # Retornar un código de estado HTTP 200 (OK) y un mensaje de éxito
             mensaje = {
                 'message': 'User registered successfully',
                 'user_id': user_id
             }
+            print(usuario)
             return {
                 'statusCode': 200,
-                'body': mensaje
+                'body': mensaje,
+                'response': response
             }
         else:
             mensaje = {
