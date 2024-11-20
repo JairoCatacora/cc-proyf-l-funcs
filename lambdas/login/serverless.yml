@@ -1,5 +1,5 @@
 org: fruit
-service: api-s3
+service: login
 
 provider:
   name: aws
