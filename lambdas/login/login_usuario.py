@@ -9,9 +9,10 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def lambda_handler(event, context):
+    print(event)
     # Entrada (json)
-    user_id = event['user_id']
-    password = event['password']
+    user_id = event['body']['user_id']
+    password = event['body']['password']
     hashed_password = hash_password(password)
     # Proceso
     dynamodb = boto3.resource('dynamodb')
