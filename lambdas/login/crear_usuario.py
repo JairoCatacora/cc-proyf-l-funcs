@@ -31,7 +31,7 @@ def lambda_handler(event, context):
                 'user_id': user_id,
                 'password': hashed_password
             }
-            response = t_usuarios.put_item(Item=usuarios)
+            response = t_usuarios.put_item(Item=usuario)
             # Retornar un código de estado HTTP 200 (OK) y un mensaje de éxito
             mensaje = {
                 'message': 'User registered successfully',
