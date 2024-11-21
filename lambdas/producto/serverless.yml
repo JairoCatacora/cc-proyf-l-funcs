@@ -1,0 +1,72 @@
+org: 
+service: api-s3
+
+provider:
+  name: aws
+  runtime: python3.12
+  # Default memory size for functions (default: 256MB)
+  memorySize: 256
+  timeout: 30
+  iam:
+    role: 
+
+functions:
+  updateProd:
+    handler: ActualizarProducto.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /product/update
+          method: put
+          cors: true
+          integration: lambda
+
+  selectProd:
+    handler: BuscarProducto.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /product/select
+          method: post
+          cors: true
+          integration: lambda
+  
+  createProd:
+    handler: CrearProducto.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /product/create
+          method: post
+          cors: true
+          integration: lambda
+
+  deleteProd:
+    handler: EliminarProducto.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /product/delete
+          method: delete
+          cors: true
+          integration: lambda
+
+  allProds:
+    handler: ListarProductos.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /product/all
+          method: post
+          cors: true
+          integration: lambda
+
+  pobProd:
+    handler: PobProductos.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /product/pob
+          method: post
+          cors: true
+          integration: lambda

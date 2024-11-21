@@ -1,0 +1,8 @@
+org: 
+service: api-s3
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1

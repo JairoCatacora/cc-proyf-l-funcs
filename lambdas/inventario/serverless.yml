@@ -1,0 +1,62 @@
+org: 
+service: api-s3
+
+provider:
+  name: aws
+  runtime: python3.12
+  # Default memory size for functions (default: 256MB)
+  memorySize: 256
+  timeout: 30
+  iam:
+    role: 
+
+functions:
+  updateInv:
+    handler: ActualizarStock.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /inventory/update
+          method: put
+          cors: true
+          integration: lambda
+
+  selectInv:
+    handler: BuscarInventarioProducto.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /inventory/select
+          method: post
+          cors: true
+          integration: lambda
+
+  deleteInv:
+    handler: EliminarProductoInventario.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /inventory/delete
+          method: delete
+          cors: true
+          integration: lambda
+
+  regInv:
+    handler: RegistrarProductoInventario.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /inventory/reg
+          method: post
+          cors: true
+          integration: lambda
+
+  pobInv:
+    handler: PobInventario.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /inventory/pob
+          method: post
+          cors: true
+          integration: lambda

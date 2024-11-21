@@ -25,4 +25,4 @@ def lambda_handler(event, context):
             'statusCode': 404,
             'body': json.dumps({'error': 'Producto no fue encontrado en el inventario'})
         }
-    }
+    

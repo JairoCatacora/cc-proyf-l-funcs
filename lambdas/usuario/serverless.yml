@@ -1,0 +1,42 @@
+org: 
+service: api-s3
+
+provider:
+  name: aws
+  runtime: python3.12
+  # Default memory size for functions (default: 256MB)
+  memorySize: 256
+  timeout: 30
+  iam:
+    role: 
+
+functions:
+  selectUser:
+    handler: BuscarUsuario.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /user/select
+          method: post
+          cors: true
+          integration: lambda
+  
+  createUser:
+    handler: CrearUsuario.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /user/create
+          method: post
+          cors: true
+          integration: lambda
+  
+  pobInv:
+    handler: PobUsuarios.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /user/pob
+          method: post
+          cors: true
+          integration: lambda
