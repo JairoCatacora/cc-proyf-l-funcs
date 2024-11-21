@@ -1,0 +1,64 @@
+org: fruit
+service: productos
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 256
+  timeout: 30
+  iam:
+    role: arn:aws:iam::943073974505:role/LabRole
+
+functions:
+  crear_producto:
+    handler: CrearProducto.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /product/create
+          method: post
+          cors: true
+          integration: lambda
+
+  listar_productos:
+    handler: ListarProductos.lambda_handler
+    runtime: nodejs18.x
+    memorySize: 512
+    events:
+      - http:
+          path: /product/list
+          method: get
+          cors: true
+          integration: lambda
+
+  actualizar_producto:
+    handler: ActualizarProducto.lambda_handler
+    runtime: nodejs18.x
+    memorySize: 512
+    events:
+      - http:
+          path: /product/update
+          method: patch
+          cors: true
+          integration: lambda
+
+  buscar_producto:
+    handler: BuscarProducto.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /product/search
+          method: get
+          cors: true
+          integration: lambda
+
+  eliminar_producto:
+    handler: EliminarProducto.lambda_handler
+    runtime: nodejs18.x
+    memorySize: 512
+    events:
+      - http:
+          path: /product/delete
+          method: delete
+          cors: true
+          integration: lambda

@@ -3,16 +3,24 @@ import json
 
 def lambda_handler(event, context):
     tenant_id = event['body']['tenant_id']
-    producto_id = event['body']['producto_id']
+    product_id = event['body']['product_id']
+    product_name = event['body']['product_name']
+    product_brand = event['body']['product_brand']
     product_info = event['body']['product_info']
+    product_price = event['body']['product_price']
+    product_stock = event['body']['product_stock']
     
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('t_productos')
     table.put_item(
         Item={
             'tenant_id': tenant_id,
-            'producto_id': producto_id,
-            'product_info': product_info
+            'product_id': product_id,
+            'product_name': product_name,
+            'product_brand': product_brand,
+            'product_info': product_info,
+            'product_price': product_price,
+            'product_stock': product_stock
         }
     )
 

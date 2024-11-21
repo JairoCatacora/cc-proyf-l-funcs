@@ -2,11 +2,11 @@ const AWS = require('aws-sdk');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 exports.lambda_handler = async (event) => {
-    const { tenant_id, producto_id } = JSON.parse(event.body);
+    const { tenant_id, product_id } = JSON.parse(event.body);
 
     const params = {
         TableName: 't_productos',
-        Key: { tenant_id, producto_id }
+        Key: { tenant_id, product_id }
     };
 
     await dynamodb.delete(params).promise();
