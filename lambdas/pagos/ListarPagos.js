@@ -1,25 +1,37 @@
 const AWS = require('aws-sdk');
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
-exports.lambda_handler = async (event) => {
-    const { tenant_id, pago_id, pago_info } = JSON.parse(event.body);
+exports.handler = async (event) => {
+    const userId = event.queryStringParameters.user_id;
 
     const params = {
         TableName: 't_pagos',
-        Key: {
-            'tenant_id': tenant_id,
-            'pago_id': pago_id
-        },
-        UpdateExpression: 'SET pago_info = :info',
+        KeyConditionExpression: 'user_id = :user_id',
         ExpressionAttributeValues: {
-            ':info': pago_info
-        },
-        ReturnValues: 'UPDATED_NEW'
+            ':user_id': userId
+        }
     };
 
-    const response = await dynamodb.update(params).promise();
-    return {
-        statusCode: 200,
-        body: JSON.stringify({ message: 'Pago updated successfully', updatedAttributes: response.Attributes })
-    };
+    try {
+        // Obtener los pagos desde la tabla DynamoDB para el user_id proporcionado
+        const data = await dynamoDB.query(params).promise();
+
+        // Devolver la lista de pagos realizados
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                message: 'Historial de pagos recuperado exitosamente',
+                pagos: data.Items
+            })
+        };
+    } catch (error) {
+        // En caso de error, devuelve un mensaje de error
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                message: 'Error al recuperar el historial de pagos',
+                error: error.message
+            })
+        };
+    }
 };
