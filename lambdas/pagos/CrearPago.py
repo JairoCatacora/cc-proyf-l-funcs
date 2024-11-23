@@ -9,6 +9,8 @@ def lambda_handler(event, context):
     pago_id = body['pago_id']
     user_id = body['user_id']
     pago_amount = body['pago_amount']
+    user_address = body['user_address']
+    user_phone = body['user_phone']
     producto_id = body['producto_id']  # Asegúrate de tener el ID del producto
 
     # Llamada al microservicio de productos para obtener el precio
@@ -42,6 +44,8 @@ def lambda_handler(event, context):
             'pago_id': pago_id,
             'user_id': user_id,
             'pago_amount': pago_amount,
+            'user_address' : user_address,
+            'user_phone' : user_phone,
             'timestamp': timestamp  # Agregando la fecha y hora del pago
         }
     )
