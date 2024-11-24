@@ -1,5 +1,5 @@
 org: fruit
-service: productos
+service: serviciocliente
 
 provider:
   name: aws
@@ -10,52 +10,42 @@ provider:
     role: arn:aws:iam::943073974505:role/LabRole
 
 functions:
-  crear_producto:
-    handler: CrearProducto.lambda_handler
+  crear_review:
+    handler: CrearReview.lambda_handler
     memorySize: 512
     events:
       - http:
-          path: /product/create
+          path: /review/create
           method: post
           cors: true
           integration: lambda
 
-  listar_productos:
-    handler: ListarProductos.lambda_handler
+  listar_reviews:
+    handler: ListarReviews.lambda_handler
     memorySize: 512
     events:
       - http:
-          path: /product/list
+          path: /review/list
           method: get
           cors: true
           integration: lambda
 
-  actualizar_producto:
-    handler: ActualizarProducto.lambda_handler
+  answer_review:
+    handler: AnswerReview.lambda_handler
     memorySize: 512
     events:
       - http:
-          path: /product/update
+          path: /review/answer
           method: patch
           cors: true
           integration: lambda
 
-  buscar_producto:
-    handler: BuscarProducto.lambda_handler
+  eliminar_review:
+    handler: EliminarReview.lambda_handler
     memorySize: 512
     events:
       - http:
-          path: /product/search
-          method: get
-          cors: true
-          integration: lambda
-
-  eliminar_producto:
-    handler: EliminarProducto.lambda_handler
-    memorySize: 512
-    events:
-      - http:
-          path: /product/delete
+          path: /review/delete
           method: delete
           cors: true
           integration: lambda

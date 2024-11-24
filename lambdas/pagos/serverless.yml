@@ -1,0 +1,41 @@
+org: fruit
+service: pagos
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 256
+  timeout: 30
+  iam:
+    role: arn:aws:iam::943073974505:role/LabRole
+
+functions:
+  crear_pago:
+    handler: CrearPago.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /pago/create
+          method: post
+          cors: true
+          integration: lambda
+
+  listar_pagos:
+    handler: ListarPagos.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /pago/list
+          method: get
+          cors: true
+          integration: lambda
+
+  buscar_pago:
+    handler: BuscarPago.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /pago/search
+          method: get
+          cors: true
+          integration: lambda
