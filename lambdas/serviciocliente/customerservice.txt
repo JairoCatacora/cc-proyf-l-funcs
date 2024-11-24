@@ -1,0 +1,9 @@
+{
+    "tenant_id": "12345",
+    "order_id": "78910",
+    "product_id": "56789",
+    "user_id": "101112",
+    "review_text": "The product was excellent, very high quality and exactly as described!",
+    "rating": 5,
+    "review_type": "product_review"
+}

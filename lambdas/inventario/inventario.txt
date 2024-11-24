@@ -1,8 +1,0 @@
-{
-    "tenant_id": "1234567890",
-    "product_id": "1234567890",
-    "inventario_info": {
-        "stock": 10,
-        "status": "available",
-    }
-}
