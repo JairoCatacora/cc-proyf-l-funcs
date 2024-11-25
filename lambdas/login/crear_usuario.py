@@ -16,7 +16,7 @@ def lambda_handler(event, context):
             body = event
             
         # Obtener el email y el password
-        tenant_id = event['body']['tenat_id']
+        tenant_id = event['body']['tenant_id']
         user_id = event['body']['user_id']
         password = event['body']['password']
         
