@@ -11,6 +11,7 @@ def hash_password(password):
 def lambda_handler(event, context):
     print(event)
     # Entrada (json)
+    tenant_id = event['body']['tenant_id']
     user_id = event['body']['user_id']
     password = event['body']['password']
     hashed_password = hash_password(password)
@@ -19,6 +20,7 @@ def lambda_handler(event, context):
     table = dynamodb.Table('t_usuarios')
     response = table.get_item(
         Key={
+            'tenant_id': tenant_id,
             'user_id': user_id
         }
     )
