@@ -16,6 +16,7 @@ def lambda_handler(event, context):
             body = event
             
         # Obtener el email y el password
+        tenant_id = event['body']['user_id']
         user_id = event['body']['user_id']
         password = event['body']['password']
         
@@ -25,9 +26,10 @@ def lambda_handler(event, context):
             hashed_password = hash_password(password)
             # Conectar DynamoDB
             dynamodb = boto3.resource('dynamodb')
-            t_usuarios = dynamodb.Table('t_usuarios')
+            t_usuarios = dynamodb.Table('pf_usuarios')
             # Almacena los datos del user en la tabla de usuarios en DynamoDB
             usuario = {
+                'tenant_id': tenant_id,
                 'user_id': user_id,
                 'password': hashed_password
             }
@@ -45,7 +47,7 @@ def lambda_handler(event, context):
             }
         else:
             mensaje = {
-                'error': 'Invalid request body: missing user_id or password'
+                'error': 'Invalid request body: missing tenant_id or user_id or password'
             }
             return {
                 'statusCode': 400,
