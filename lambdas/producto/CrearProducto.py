@@ -7,8 +7,8 @@ def lambda_handler(event, context):
     product_name = event['body']['product_name']
     product_brand = event['body']['product_brand']
     product_info = event['body']['product_info']
-    product_price = event['body']['product_price']
-    product_stock = event['body']['product_stock']
+    product_price = Decimal(str(event['body']['product_price']))
+    product_stock = int(event['body']['product_stock'])
     
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('t_productos')
