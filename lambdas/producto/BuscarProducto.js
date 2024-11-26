@@ -4,10 +4,11 @@ const { DynamoDBDocumentClient, GetCommand, ScanCommand } = require("@aws-sdk/li
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
-exports.lambda_handler = async (event) => {
+exports.handler = async (event) => {
   try {
-    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-    const { tenant_id, product_id, product_name } = body;
+    const tenant_id = event.queryStringParameters.tenant_id;
+    const product_id = event.queryStringParameters.product_id;
+    const product_name = event.queryStringParameters.product_name;
 
     if (!tenant_id) {
       return {
@@ -16,16 +17,29 @@ exports.lambda_handler = async (event) => {
       };
     }
 
-    let response;
     if (product_id) {
-      response = await dynamo.send(
+      const response = await dynamo.send(
         new GetCommand({
           TableName: "t_productos",
           Key: { tenant_id, product_id },
         })
       );
-    } else if (product_name) {
-      response = await dynamo.send(
+
+      if (response.Item) {
+        return {
+          statusCode: 200,
+          body: JSON.stringify(response.Item),
+        };
+      } else {
+        return {
+          statusCode: 404,
+          body: JSON.stringify({ error: "Product not found" }),
+        };
+      }
+    }
+
+    if (product_name) {
+      const response = await dynamo.send(
         new ScanCommand({
           TableName: "t_productos",
           FilterExpression: "tenant_id = :tenant_id AND product_name = :product_name",
@@ -35,24 +49,29 @@ exports.lambda_handler = async (event) => {
           },
         })
       );
+
+      if (response.Items.length > 0) {
+        return {
+          statusCode: 200,
+          body: JSON.stringify(response.Items),
+        };
+      } else {
+        return {
+          statusCode: 404,
+          body: JSON.stringify({ error: "Product not found" }),
+        };
+      }
     }
 
-    if (response.Items && response.Items.length > 0) {
-      return {
-        statusCode: 200,
-        body: JSON.stringify(response.Items),
-      };
-    } else {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: "Product not found" }),
-      };
-    }
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Either product_id or product_name must be provided" }),
+    };
   } catch (error) {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message || "An error occurred" }),
+      body: JSON.stringify({ error: error.message || "An error occurred while searching for the product" }),
     };
   }
 };

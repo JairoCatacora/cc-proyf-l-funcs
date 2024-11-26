@@ -4,37 +4,43 @@ const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb"
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
-exports.lambda_handler = async (event) => {
+exports.handler = async (event) => {
   try {
-    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-    const { tenant_id } = body;
+    const tenant_id = event.queryStringParameters.tenant_id;
 
     if (!tenant_id) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: "tenant_id is required" }),
+        body: JSON.stringify({ error: "tenant_id is required" }),
       };
     }
 
-    const params = {
-      TableName: "t_productos",
-      KeyConditionExpression: "tenant_id = :tenant_id",
-      ExpressionAttributeValues: {
-        ":tenant_id": tenant_id,
-      },
-    };
+    const response = await dynamo.send(
+      new QueryCommand({
+        TableName: "t_productos",
+        KeyConditionExpression: "tenant_id = :tenant_id",
+        ExpressionAttributeValues: {
+          ":tenant_id": tenant_id,
+        },
+      })
+    );
 
-    const response = await dynamo.send(new QueryCommand(params));
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(response.Items.length ? response.Items : { message: "No products found" }),
-    };
+    if (response.Items && response.Items.length > 0) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify(response.Items),
+      };
+    } else {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: "No products found for the given tenant_id" }),
+      };
+    }
   } catch (error) {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Internal server error", error: error.message }),
+      body: JSON.stringify({ error: error.message || "An error occurred while listing the products" }),
     };
   }
 };
