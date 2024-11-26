@@ -1,6 +1,8 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
 
+const Decimal = require("decimal.js");
+
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
@@ -29,7 +31,7 @@ exports.lambda_handler = async (event) => {
         ":name": product_name,
         ":brand": product_brand,
         ":info": product_info,
-        ":price": Number(product_price),
+        ":price": new Decimal(product_price).toNumber(),
         ":stock": Number(product_stock),
       },
       ReturnValues: "UPDATED_NEW",

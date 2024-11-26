@@ -4,7 +4,7 @@ const { DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb");
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
-exports.handler = async (event) => {
+exports.lambda_handler = async (event) => {
   try {
     const productData = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
 
@@ -17,8 +17,8 @@ exports.handler = async (event) => {
           product_name: productData.product_name,
           product_brand: productData.product_brand,
           product_info: productData.product_info,
-          product_price: parseFloat(productData.product_price), // Convertir a decimal
-          product_stock: parseInt(productData.product_stock, 10), // Convertir a entero
+          product_price: parseFloat(productData.product_price), 
+          product_stock: parseInt(productData.product_stock, 10), 
         },
       })
     );
