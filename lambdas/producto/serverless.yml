@@ -3,7 +3,7 @@ service: productos
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   memorySize: 1024
   timeout: 30
   iam:
