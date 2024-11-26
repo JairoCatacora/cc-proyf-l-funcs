@@ -4,9 +4,9 @@ const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb"
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
-exports.handler = async (event) => {
+exports.lambda_handler = async (event) => {
   try {
-    const tenant_id = event.queryStringParameters.tenant_id;
+    const tenant_id = event.query.tenant_id;
 
     if (!tenant_id) {
       return {

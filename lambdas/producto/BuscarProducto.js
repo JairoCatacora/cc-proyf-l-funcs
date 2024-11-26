@@ -4,11 +4,11 @@ const { DynamoDBDocumentClient, GetCommand, ScanCommand } = require("@aws-sdk/li
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
-exports.handler = async (event) => {
+exports.lambda_handler = async (event) => {
   try {
-    const tenant_id = event.queryStringParameters.tenant_id;
-    const product_id = event.queryStringParameters.product_id;
-    const product_name = event.queryStringParameters.product_name;
+    const tenant_id = event.query.tenant_id;
+    const product_id = event.query.product_id;
+    const product_name = event.query.product_name;
 
     if (!tenant_id) {
       return {
