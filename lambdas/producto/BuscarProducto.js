@@ -30,7 +30,7 @@ exports.lambda_handler = async (event) => {
       if (response.Item) {
         return {
           statusCode: 200,
-          body: result.Item
+          body: response.Item
         };
       } else {
         return {
