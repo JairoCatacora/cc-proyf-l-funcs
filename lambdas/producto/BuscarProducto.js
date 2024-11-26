@@ -13,7 +13,9 @@ exports.lambda_handler = async (event) => {
     if (!tenant_id) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "tenant_id is required" }),
+        body: {
+          message : "tenant_id is required" 
+        }
       };
     }
 
@@ -28,12 +30,14 @@ exports.lambda_handler = async (event) => {
       if (response.Item) {
         return {
           statusCode: 200,
-          body: JSON.stringify(response.Item),
+          body: result.Item
         };
       } else {
         return {
           statusCode: 404,
-          body: JSON.stringify({ error: "Product not found" }),
+          body: { 
+            message: "Product not found" 
+          }
         };
       }
     }
@@ -53,25 +57,31 @@ exports.lambda_handler = async (event) => {
       if (response.Items.length > 0) {
         return {
           statusCode: 200,
-          body: JSON.stringify(response.Items),
+          body: response.Items
         };
       } else {
         return {
           statusCode: 404,
-          body: JSON.stringify({ error: "Product not found" }),
+          body: { 
+            message: "Product not found" 
+          }
         };
       }
     }
 
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Either product_id or product_name must be provided" }),
+      body: { 
+        message: "Either product_id or product_name must be provided" 
+      }
     };
   } catch (error) {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message || "An error occurred while searching for the product" }),
+      body: { 
+        error: error.message || "An error occurred while searching for the product" 
+      }
     };
   }
 };
