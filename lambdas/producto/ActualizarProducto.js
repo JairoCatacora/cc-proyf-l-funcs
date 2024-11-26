@@ -6,7 +6,8 @@ const dynamo = DynamoDBDocumentClient.from(client);
 
 exports.lambda_handler = async (event) => {
   try {
-    const { tenant_id, product_id, product_name, product_brand, product_info, product_price, product_stock } = JSON.parse(event.body);
+    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+    const { tenant_id, product_id, product_name, product_brand, product_info, product_price, product_stock } = body;
 
     if (!tenant_id || !product_id || !product_name || !product_brand || !product_price || !product_stock) {
       return {
@@ -18,13 +19,8 @@ exports.lambda_handler = async (event) => {
     const params = {
       TableName: "t_productos",
       Key: { tenant_id, product_id },
-      UpdateExpression: `
-        SET product_name = :name,
-            product_brand = :brand,
-            product_info = :info,
-            product_price = :price,
-            product_stock = :stock
-      `,
+      UpdateExpression:
+        "SET product_name = :name, product_brand = :brand, product_info = :info, product_price = :price, product_stock = :stock",
       ExpressionAttributeValues: {
         ":name": product_name,
         ":brand": product_brand,
@@ -35,7 +31,9 @@ exports.lambda_handler = async (event) => {
       ReturnValues: "UPDATED_NEW",
     };
 
+    // Enviar la actualización a DynamoDB
     const response = await dynamo.send(new UpdateCommand(params));
+
     return {
       statusCode: 200,
       body: JSON.stringify({
