@@ -11,7 +11,9 @@ exports.lambda_handler = async (event) => {
     if (!tenant_id) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "tenant_id is required" }),
+        body: {
+          message: "tenant_id is required"
+        }
       };
     }
 
@@ -28,19 +30,23 @@ exports.lambda_handler = async (event) => {
     if (response.Items && response.Items.length > 0) {
       return {
         statusCode: 200,
-        body: JSON.stringify(response.Items),
+        body: response.Items
       };
     } else {
       return {
         statusCode: 404,
-        body: JSON.stringify({ message: "No products found for the given tenant_id" }),
+        body: {
+          message: "No products found for the given tenant_id"
+        }
       };
     }
   } catch (error) {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message || "An error occurred while listing the products" }),
+      body: {
+        error: error.message || "An error occurred while listing the products"
+      }
     };
   }
 };
