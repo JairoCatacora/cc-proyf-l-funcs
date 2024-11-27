@@ -1,20 +1,24 @@
 import json
 import boto3
-import requests
+import urllib3
 from datetime import datetime, timedelta
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('pf_ordenes')
 
+http = urllib3.PoolManager()
+
 def lambda_handler(event, context):
     try:
-        tenant_id = event['body']['tenant_id']
-        order_id = event['body']['order_id']
-        user_info = event['body']['user_info']
+        body = json.loads(event['body'])
+        
+        tenant_id = body['tenant_id']
+        order_id = body['order_id']
+        user_info = body['user_info']
         creation_date = datetime.now()
         shipping_date = creation_date + timedelta(days=7)
-        product_list = event['body']['products'] 
-        
+        product_list = body['products'] 
+
         if not product_list:
             return {
                 "statusCode": 400,
@@ -25,15 +29,11 @@ def lambda_handler(event, context):
         for product in product_list:
             product_id = product['product_id']
             quantity = product['quantity']
-  
-            url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/product/search"
-            params = {
-                "tenant_id": tenant_id,
-                "product_id": product_id
-            }
-            response = requests.get(url, params=params)
             
-            if response.status_code != 200:
+            url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/product/search?tenant_id={tenant_id}&product_id={product_id}"
+            response = http.request('GET', url)
+            
+            if response.status != 200:
                 return {
                     "statusCode": 404,
                     "body": json.dumps({
@@ -41,11 +41,10 @@ def lambda_handler(event, context):
                     })
                 }
             
-            product_data = response.json()
+            product_data = json.loads(response.data.decode('utf-8'))
             price = float(product_data['price'])
             total_price += price * quantity
         
-        # Crear la orden en DynamoDB
         table.put_item(
             Item={
                 "tenant_id": tenant_id,
