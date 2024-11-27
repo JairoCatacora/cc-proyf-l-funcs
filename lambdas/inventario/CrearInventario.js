@@ -15,8 +15,7 @@ exports.lambda_handler = async (event) => {
           tenant_id: inventoryData.tenant_id,
           inventory_id: inventoryData.inventory_id,
           product_id: inventoryData.product_id,
-          stock: inventoryData.stock,
-          location: inventoryData.location,
+          stock: inventoryData.stock
         },
       })
     );

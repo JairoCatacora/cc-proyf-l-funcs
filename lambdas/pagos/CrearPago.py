@@ -1,50 +1,34 @@
 import boto3
 import json
-import datetime
-import requests
+from datetime import datetime
+
+dynamodb = boto3.resource('dynamodb')
+table_payments = dynamodb.Table('t_payments')
 
 def lambda_handler(event, context):
-    tenant_id = event['body']['tenant_id']
-    user_id = event['body']['user_id']
-    products = event['body']['products'] 
-
     try:
-        total_amount = 0
-        for product in products:
-            response = requests.get(f"url/{product['product_id']}")
-            product_data = response.json()
-            total_amount += product_data['product_price'] * product['quantity']
+        order_id = event['body']['order_id']
+        tenant_id = event['body']['tenant_id']
+        payment_id = event['body']['payment_id']
 
-        user_response = requests.get(f"url/users/{user_id}")
-        user_data = user_response.json()
+        timestamp = datetime.utcnow().isoformat()
 
-        user_info = {
-            "user_address": user_data['user_address'],
-            "user_phone": user_data['user_phone']
-        }
-
-        dynamodb = boto3.resource('dynamodb')
-        payments_table = dynamodb.Table('pf_pagos')
-
-        payment_id = str(uuid.uuid4())
-        payment_item = {
-            'tenant_id': tenant_id,
-            'payment_id': payment_id,
-            'user_id': user_id,
-            'products': products,
-            'total': total_amount,
-            'user_info': user_info,
-            'timestamp': datetime.datetime.utcnow().isoformat()
-        }
-
-        payments_table.put_item(Item=payment_item)
+        table_payments.put_item(
+            Item={
+                'order_id': order_id,
+                'payment_id': payment_id,
+                'tenant_id': tenant_id,
+                'total': payment_data['total'],
+                'timestamp': timestamp
+            }
+        )
 
         return {
             'statusCode': 201,
-            'body': {'message': 'Payment created successfully', 'payment_id': payment_id, 'total': total_amount, 'user_info': user_info}
+            'body': json.dumps({'message': 'Payment created successfully', 'payment_id': payment_id})
         }
     except Exception as e:
         return {
             'statusCode': 500,
-            'body': {'message': f'Error al crear el pago: {str(e)}'}
+            'body': json.dumps({'message': f"Error creating payment: {str(e)}"})
         }
