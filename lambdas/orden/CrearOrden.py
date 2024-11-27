@@ -26,7 +26,7 @@ def lambda_handler(event, context):
             product_id = product['product_id']
             quantity = product['quantity']
   
-            url = f"https://pfj6am2bx0.execute-api.us-east-1.amazonaws.com/dev/product/search"
+            url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/product/search"
             params = {
                 "tenant_id": tenant_id,
                 "product_id": product_id
