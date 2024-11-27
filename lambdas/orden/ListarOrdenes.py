@@ -1,28 +1,23 @@
 import boto3
 import json
 
-# Inicializar recurso de DynamoDB
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('pf_ordenes')
 
 def lambda_handler(event, context):
     try:
-        tenant_id = event['query'].get('tenant_id')
-        user_id = event['query'].get('user_id')
+        user_id = event['query']['user_id']
+        order_id = event['query']['order_id']
 
-        if not tenant_id or not user_id:
+        if not user_id or not order_id:
             return {
                 'statusCode': 400,
-                'body': {'message': 'tenant_id y user_id son requeridos.'}
+                'body': {'message': 'user_id y order_id son requeridos.'}
             }
 
         response = table.query(
-            IndexName='tenant_id-user_id-index', 
-            KeyConditionExpression='tenant_id = :tenant_id AND user_id = :user_id',
-            ExpressionAttributeValues={
-                ':tenant_id': tenant_id,
-                ':user_id': user_id
-            }
+            IndexName='user_id-order_id-index',
+            KeyConditionExpression=Key('user_id').eq(user_id) & Key('order_id').eq(order_id)
         )
 
         return {

@@ -44,7 +44,8 @@ def lambda_handler(event, context):
 
         table.put_item(
             Item={
-                "tenant_id#order_id": f"{tenant_id}#{order_id}",
+                "tenant_id": tenant_id,
+                "order_id" : order_id,
                 "user_id": user_id,
                 "user_info": user_info,
                 "creation_date": creation_date.isoformat(),

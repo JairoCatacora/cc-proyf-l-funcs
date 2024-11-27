@@ -7,13 +7,12 @@ def lambda_handler(event, context):
     try:
         tenant_id = event['body']['tenant_id']
         order_id = event['body']['order_id']
-        user_id = event['body']['user_id']
         order_status = event['body']['order_status']
 
         response = table.update_item(
             Key={
-                "PK": f"{tenant_id}#{order_id}",
-                "SK": user_id
+                "tenant_id": tenant_id,
+                "#order_id": order_id
             },
             UpdateExpression="SET order_status = :status",
             ExpressionAttributeValues={
