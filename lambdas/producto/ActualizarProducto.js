@@ -26,7 +26,6 @@ exports.lambda_handler = async (event) => {
         ":brand": product_brand,
         ":info": product_info,
         ":price": Number(product_price),
-        ":stock": Number(product_stock),
       },
       ReturnValues: "UPDATED_NEW",
     };

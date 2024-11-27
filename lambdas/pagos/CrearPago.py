@@ -1,21 +1,18 @@
 import boto3
 import json
 import datetime
-import requests  # Asegúrate de incluir esta librería en el entorno de Lambda si es necesaria
+import requests 
 
 def lambda_handler(event, context):
-    body = json.loads(event['body'])
-    tenant_id = body['tenant_id']
-    pago_id = body['pago_id']
-    user_id = body['user_id']
-    pago_amount = body['pago_amount']
-    user_address = body['user_address']
-    user_phone = body['user_phone']
-    producto_id = body['producto_id']  # Asegúrate de tener el ID del producto
+    tenant_id = event['body']['tenant_id']
+    pago_id = event['body']['pago_id']
+    user_id = event['body']['user_id']
+    pago_amount = event['body']['pago_amount']
+    user_info = event['body']['user_info']
+    productos_id = event['body']['productos_id']
 
-    # Llamada al microservicio de productos para obtener el precio
     try:
-        response = requests.get(f"https://tu-microservicio-productos.com/productos/{producto_id}")
+        response = requests.get(f"https://pfj6am2bx0.execute-api.us-east-1.amazonaws.com/dev/product/search?tenant_id={tenant_id}&product_id={producto_id}")
         response_data = response.json()
         precio_producto = response_data['precio']
 
@@ -46,7 +43,7 @@ def lambda_handler(event, context):
             'pago_amount': pago_amount,
             'user_address' : user_address,
             'user_phone' : user_phone,
-            'timestamp': timestamp  # Agregando la fecha y hora del pago
+            'timestamp': timestamp 
         }
     )
 

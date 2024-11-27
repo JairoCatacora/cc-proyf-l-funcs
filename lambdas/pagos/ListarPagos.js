@@ -1,37 +1,64 @@
-const AWS = require('aws-sdk');
-const dynamoDB = new AWS.DynamoDB.DocumentClient();
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 
-exports.handler = async (event) => {
-    const userId = event.queryStringParameters.user_id;
+const client = new DynamoDBClient({});
+const dynamo = DynamoDBDocumentClient.from(client);
+
+exports.lambda_handler = async (event) => {
+  try {
+    const tenant_id = event.query.tenant_id;
+    const userId = event.query.userId;
+
+    if (!tenant_id || !userId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          message: "tenant_id and userId are required",
+        }),
+      };
+    }
 
     const params = {
-        TableName: 't_pagos',
-        KeyConditionExpression: 'user_id = :user_id',
-        ExpressionAttributeValues: {
-            ':user_id': userId
-        }
+      TableName: "t_pagos",
+      KeyConditionExpression: "tenant_id = :tenant_id AND user_id = :user_id",
+      ExpressionAttributeValues: {
+        ":tenant_id": tenant_id,
+        ":user_id": userId,
+      },
     };
 
-    try {
-        // Obtener los pagos desde la tabla DynamoDB para el user_id proporcionado
-        const data = await dynamoDB.query(params).promise();
+    const data = await dynamo.send(
+        new QueryCommand({
+            TableName: "t_pagos",
+            KeyConditionExpression: "tenant_id = :tenant_id AND user_id = :user_id",
+            ExpressionAttributeValues: {
+                ":tenant_id": tenant_id,
+                ":user_id": userId,
+            },
+        })
+    );
 
-        // Devolver la lista de pagos realizados
+    if (response.Items && response.Items.length > 0) {
         return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: 'Historial de pagos recuperado exitosamente',
-                pagos: data.Items
-            })
+          statusCode: 200,
+          body: data.Items
         };
-    } catch (error) {
-        // En caso de error, devuelve un mensaje de error
+      } else {
         return {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: 'Error al recuperar el historial de pagos',
-                error: error.message
-            })
+          statusCode: 404,
+          body: {
+            message: "No products found for the given tenant_id",
+            body: data.Items || [],
+          }
         };
-    }
+      }
+  } catch (error) {
+    console.error("Error al recuperar el historial de pagos:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: error.message || "Error al recuperar el historial de pagos"
+      }),
+    };
+  }
 };

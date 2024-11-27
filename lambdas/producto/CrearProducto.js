@@ -17,8 +17,7 @@ exports.lambda_handler = async (event) => {
           product_name: productData.product_name,
           product_brand: productData.product_brand,
           product_info: productData.product_info,
-          product_price: parseFloat(productData.product_price), 
-          product_stock: parseInt(productData.product_stock, 10), 
+          product_price: parseFloat(productData.product_price)
         },
       })
     );

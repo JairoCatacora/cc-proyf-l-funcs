@@ -1,21 +1,11 @@
 import boto3
 import hashlib
 
-# Hashear contraseña
 def hash_password(password):
-    # Retorna la contraseña hasheada
     return hashlib.sha256(password.encode()).hexdigest()
 
-# Función que maneja el registro de user y validación del password
 def lambda_handler(event, context):
     try:
-        # Convertir el cuerpo a JSON si es una cadena
-        if isinstance(event.get('body'), str):
-            body = json.loads(event['body'])
-        else:
-            body = event
-            
-        # Obtener el email y el password
         tenant_id = event['body']['tenant_id']
         user_id = event['body']['user_id']
         password = event['body']['password']
