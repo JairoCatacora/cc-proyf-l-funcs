@@ -10,19 +10,17 @@ http = urllib3.PoolManager()
 
 def lambda_handler(event, context):
     try:
-        body = json.loads(event['body'])
-        
-        tenant_id = body['tenant_id']
-        order_id = body['order_id']
-        user_info = body['user_info']
+        tenant_id = event['body']['tenant_id']
+        order_id = event['body']['order_id']
+        user_info = event['body']['user_info']
         creation_date = datetime.now()
         shipping_date = creation_date + timedelta(days=7)
-        product_list = body['products'] 
+        product_list = event['body']['products'] 
 
         if not product_list:
             return {
                 "statusCode": 400,
-                "body": json.dumps({"message": "La lista de productos no puede estar vacía."})
+                "body": {"message": "La lista de productos no puede estar vacía."}
             }
         
         total_price = 0
@@ -36,15 +34,15 @@ def lambda_handler(event, context):
             if response.status != 200:
                 return {
                     "statusCode": 404,
-                    "body": json.dumps({
+                    "body": {
                         "message": f"No se encontró información para el producto con ID {product_id}"
-                    })
+                    }
                 }
             
             product_data = json.loads(response.data.decode('utf-8'))
             price = float(product_data['price'])
             total_price += price * quantity
-        
+     
         table.put_item(
             Item={
                 "tenant_id": tenant_id,
@@ -59,18 +57,19 @@ def lambda_handler(event, context):
         
         return {
             "statusCode": 201,
-            "body": json.dumps({
+            "body": {
                 "message": "Orden creada exitosamente",
                 "order_id": order_id,
                 "total_price": total_price
-            })
+            }
         }
     
     except Exception as e:
         return {
             "statusCode": 500,
-            "body": json.dumps({
+            "body": {
                 "message": "Error al crear la orden",
                 "error": str(e)
-            })
+            }
         }
+
