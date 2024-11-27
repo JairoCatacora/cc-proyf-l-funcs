@@ -10,12 +10,12 @@ def hash_password(password):
 
 def lambda_handler(event, context):
     print(event)
-    # Entrada (json)
+
     tenant_id = event['body']['tenant_id']
     user_id = event['body']['user_id']
     password = event['body']['password']
     hashed_password = hash_password(password)
-    # Proceso
+
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('pf_usuarios')
     response = table.get_item(
@@ -32,7 +32,7 @@ def lambda_handler(event, context):
     else:
         hashed_password_bd = response['Item']['password']
         if hashed_password == hashed_password_bd:
-            # Genera token
+
             token = str(uuid.uuid4())
             fecha_hora_exp = datetime.now() + timedelta(minutes=60)
             registro = {
@@ -47,7 +47,7 @@ def lambda_handler(event, context):
                 'body': 'Password incorrecto'
             }
     
-    # Salida (json)
+
     return {
         'statusCode': 200,
         'token': token

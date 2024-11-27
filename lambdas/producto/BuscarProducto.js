@@ -22,7 +22,7 @@ exports.lambda_handler = async (event) => {
     if (product_id) {
       const response = await dynamo.send(
         new GetCommand({
-          TableName: "t_productos",
+          TableName: "pf_productos",
           Key: { tenant_id, product_id },
         })
       );
@@ -45,7 +45,7 @@ exports.lambda_handler = async (event) => {
     if (product_name) {
       const response = await dynamo.send(
         new ScanCommand({
-          TableName: "t_productos",
+          TableName: "pf_productos",
           FilterExpression: "tenant_id = :tenant_id AND product_name = :product_name",
           ExpressionAttributeValues: {
             ":tenant_id": tenant_id,

@@ -17,7 +17,7 @@ exports.lambda_handler = async (event) => {
     }
 
     const params = {
-      TableName: "t_productos",
+      TableName: "pf_productos",
       Key: { tenant_id, product_id },
       UpdateExpression:
         "SET product_name = :name, product_brand = :brand, product_info = :info, product_price = :price, product_stock = :stock",

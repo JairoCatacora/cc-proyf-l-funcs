@@ -19,7 +19,7 @@ exports.lambda_handler = async (event) => {
 
     const response = await dynamo.send(
       new QueryCommand({
-        TableName: "t_productos",
+        TableName: "pf_productos",
         KeyConditionExpression: "tenant_id = :tenant_id",
         ExpressionAttributeValues: {
           ":tenant_id": tenant_id,

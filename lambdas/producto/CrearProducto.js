@@ -10,7 +10,7 @@ exports.lambda_handler = async (event) => {
 
     await dynamo.send(
       new PutCommand({
-        TableName: "t_productos",
+        TableName: "pf_productos",
         Item: {
           tenant_id: productData.tenant_id,
           product_id: productData.product_id,

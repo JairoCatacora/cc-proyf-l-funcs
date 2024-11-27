@@ -12,14 +12,14 @@ exports.lambda_handler = async (event) => {
     if (!tenant_id || !userId) {
       return {
         statusCode: 400,
-        body: JSON.stringify({
+        body: {
           message: "tenant_id and userId are required",
-        }),
+        },
       };
     }
 
     const params = {
-      TableName: "t_pagos",
+      TableName: "pf_pagos",
       KeyConditionExpression: "tenant_id = :tenant_id AND user_id = :user_id",
       ExpressionAttributeValues: {
         ":tenant_id": tenant_id,
