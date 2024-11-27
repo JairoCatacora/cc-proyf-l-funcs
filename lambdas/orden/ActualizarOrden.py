@@ -12,7 +12,7 @@ def lambda_handler(event, context):
         response = table.update_item(
             Key={
                 "tenant_id": tenant_id,
-                "#order_id": order_id
+                "order_id": order_id
             },
             UpdateExpression="SET order_status = :status",
             ExpressionAttributeValues={
