@@ -1,34 +1,34 @@
 import boto3
-import json
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('pf_ordenes')
 
 def lambda_handler(event, context):
     try:
         tenant_id = event['body']['tenant_id']
         order_id = event['body']['order_id']
-        estado = event['body']['order_status']
-
-        dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table('pf_ordenes')
+        user_id = event['body']['user_id']
+        order_status = event['body']['order_status']
 
         response = table.update_item(
             Key={
-                'tenant_id': tenant_id,
-                'order_id': order_id
+                "PK": f"{tenant_id}#{order_id}",
+                "SK": user_id
             },
-            UpdateExpression="SET estado = :estado",
+            UpdateExpression="SET order_status = :status",
             ExpressionAttributeValues={
-                ':estado': estado
+                ":status": order_status
             },
             ReturnValues="UPDATED_NEW"
         )
 
         return {
-            'statusCode': 200,
-            'body': {'message': 'Order status updated successfully', 'updated': response['Attributes']}
+            "statusCode": 200,
+            "body": {"message": "Estado de la orden actualizado", "updated": response['Attributes']}
         }
 
     except Exception as e:
         return {
-            'statusCode': 500,
-            'body': {'message': f'Error updating order: {str(e)}'}
+            "statusCode": 500,
+            "body": {"message": "Error al actualizar la orden", "error": str(e)}
         }

@@ -1,22 +1,23 @@
 import boto3
 import json
 
+# Inicializar recurso de DynamoDB
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('pf_ordenes')
+
 def lambda_handler(event, context):
-    tenant_id = event['query'].get('tenant_id')
-    user_id = event['query'].get('user_id')
-
-    if not tenant_id or not user_id:
-        return {
-            'statusCode': 400,
-            'body': {'message': 'tenant_id y user_id son requeridos.'}
-        }
-
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('pf_ordenes')
-
     try:
+        tenant_id = event['query'].get('tenant_id')
+        user_id = event['query'].get('user_id')
+
+        if not tenant_id or not user_id:
+            return {
+                'statusCode': 400,
+                'body': {'message': 'tenant_id y user_id son requeridos.'}
+            }
+
         response = table.query(
-            IndexName='OrdenesUsuarioIndex',
+            IndexName='tenant_id-user_id-index', 
             KeyConditionExpression='tenant_id = :tenant_id AND user_id = :user_id',
             ExpressionAttributeValues={
                 ':tenant_id': tenant_id,
@@ -26,7 +27,10 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 200,
-            'body': response.get('Items', [])
+            'body': {
+                'message': 'Órdenes listadas exitosamente',
+                'orders': response.get('Items', [])
+            }
         }
 
     except Exception as e:
