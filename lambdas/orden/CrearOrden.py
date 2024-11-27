@@ -47,10 +47,10 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 201,
-            'body': json.dumps({'message': 'Order created successfully', 'order_id': order_id})
+            'body': {'message': 'Order created successfully', 'order_id': order_id}
         }
     except Exception as e:
         return {
             'statusCode': 500,
-            'body': json.dumps({'message': f'Error al crear la orden: {str(e)}'})
+            'body': {'message': f'Error al crear la orden: {str(e)}'}
         }

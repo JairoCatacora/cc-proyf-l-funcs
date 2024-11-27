@@ -41,10 +41,10 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 201,
-            'body': json.dumps({'message': 'Payment created successfully', 'payment_id': payment_id, 'total': total_amount, 'user_info': user_info})
+            'body': {'message': 'Payment created successfully', 'payment_id': payment_id, 'total': total_amount, 'user_info': user_info}
         }
     except Exception as e:
         return {
             'statusCode': 500,
-            'body': json.dumps({'message': f'Error al crear el pago: {str(e)}'})
+            'body': {'message': f'Error al crear el pago: {str(e)}'}
         }

@@ -1,0 +1,50 @@
+org: fruit
+service: productos
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  memorySize: 1024
+  timeout: 30
+  iam:
+    role: arn:aws:iam::943073974505:role/LabRole
+
+functions:
+  crear_inventorio:
+    handler: CrearInventorio.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /inventory/create
+          method: post
+          cors: true
+          integration: lambda
+
+
+  listar_inventorio:
+    handler: ListarInventorio.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /inventory/list
+          method: get
+          cors: true
+          integration: lambda
+
+  actualizar_stock:
+    handler: ActualizarStock.lambda_handler
+    events:
+      - http:
+          path: /inventory/update
+          method: put
+          cors: true
+          integration: lambda
+
+  eliminar_producto:
+    handler: EliminarProductoInventario.lambda_handler
+    events:
+      - http:
+          path: /inventory/delete
+          method: delete
+          cors: true
+          integration: lambda

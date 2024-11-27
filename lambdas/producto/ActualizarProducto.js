@@ -30,21 +30,20 @@ exports.lambda_handler = async (event) => {
       ReturnValues: "UPDATED_NEW",
     };
 
-    // Enviar la actualización a DynamoDB
     const response = await dynamo.send(new UpdateCommand(params));
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
+      body:{
         message: "Product updated successfully",
         updatedAttributes: response.Attributes,
-      }),
+      },
     };
   } catch (error) {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Internal server error", error: error.message }),
+      body: { message: "Internal server error", error: error.message },
     };
   }
 };

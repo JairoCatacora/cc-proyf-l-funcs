@@ -24,16 +24,16 @@ exports.lambda_handler = async (event) => {
 
     return {
       statusCode: 201,
-      body: JSON.stringify({
+      body: {
         message: "Product created successfully",
-      }),
+      },
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
+      body: {
         error: error.message || "An error occurred while creating the product",
-      }),
+      },
     };
   }
 };

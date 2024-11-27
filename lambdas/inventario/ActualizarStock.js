@@ -1,44 +1,46 @@
-const AWS = require('aws-sdk');
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
+
+const client = new DynamoDBClient({});
+const dynamo = DynamoDBDocumentClient.from(client);
 
 exports.lambda_handler = async (event) => {
-    const { tenant_id, product_id } = event.pathParameters;
-    const { adjustment } = JSON.parse(event.body);
-    if (!adjustment) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: 'Invalid request body: missing adjustment' })
-        };
-    }
-    const paramsGet = {
-        TableName: 't_inventarios',
-        Key: { tenant_id, product_id }
-    };
-    const { Item } = await dynamodb.get(paramsGet).promise();
-    if (!Item) {
-        return {
-            statusCode: 404,
-            body: JSON.stringify({ error: 'Producto no fue encontrado en el inventario' })
-        };
-    }
-    const newStock = Item.inventario_info.stock + adjustment;
-    const newStatus = newStock > 0 ? 'available' : 'out_of_stock';
-    const paramsUpdate = {
-        TableName: 't_inventarios',
-        Key: { tenant_id, product_id },
-        UpdateExpression: 'SET inventario_info.stock = :stock, inventario_info.status = :status',
-        ExpressionAttributeValues: {
-            ':stock': newStock,
-            ':status': newStatus
+  try {
+    const inventoryData = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+
+    await dynamo.send(
+      new UpdateCommand({
+        TableName: "pf_inventarios",
+        Key: {
+          inventory_id: inventoryData.inventory_id,
+          tenant_id: inventoryData.tenant_id,
         },
-        ReturnValues: 'UPDATED_NEW'
-    };
-    const result = await dynamodb.update(paramsUpdate).promise();
+        UpdateExpression: `
+          SET 
+            product_id = if_not_exists(product_id, :product_id),
+            stock = if_not_exists(stock, :new_stock) + :new_stock,
+            location = :location
+        `,
+        ExpressionAttributeValues: {
+          ":product_id": inventoryData.product_id,
+          ":new_stock": inventoryData.stock,
+          ":location": inventoryData.location,
+        },
+      })
+    );
+
     return {
-        statusCode: 200,
-        body: JSON.stringify({
-            message: 'Stock actualizado correctamente',
-            updatedAttributes: result.Attributes
-        })
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Product added/updated in inventory successfully",
+      }),
     };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: error.message || "An error occurred while updating the inventory",
+      }),
+    };
+  }
 };

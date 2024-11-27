@@ -39,16 +39,16 @@ def lambda_handler(event, context):
         if pagos:
             return {
                 'statusCode': 200,
-                'body': json.dumps({'message': 'Pagos encontrados', 'pagos': pagos})
+                'body': {'message': 'Pagos encontrados', 'pagos': pagos}
             }
         else:
             return {
                 'statusCode': 404,
-                'body': json.dumps({'message': 'No se encontraron pagos con los criterios dados'})
+                'body': {'message': 'No se encontraron pagos con los criterios dados'}
             }
 
     except Exception as e:
         return {
             'statusCode': 500,
-            'body': json.dumps({'message': f'Error buscando pagos: {str(e)}'})
+            'body': {'message': f'Error buscando pagos: {str(e)}'}
         }

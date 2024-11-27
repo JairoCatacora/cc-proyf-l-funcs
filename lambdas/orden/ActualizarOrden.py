@@ -24,11 +24,11 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Order status updated successfully', 'updated': response['Attributes']})
+            'body': {'message': 'Order status updated successfully', 'updated': response['Attributes']}
         }
 
     except Exception as e:
         return {
             'statusCode': 500,
-            'body': json.dumps({'message': f'Error updating order: {str(e)}'})
+            'body': {'message': f'Error updating order: {str(e)}'}
         }
