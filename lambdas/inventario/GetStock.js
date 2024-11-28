@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, GetCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -11,7 +11,7 @@ exports.lambda_handler = async (event) => {
     const { inventory_id } = event.inventory_id;
 
     const response = await dynamo.send(
-      new GetCommand({
+      new QueryCommand({
         TableName: "pf_inventario",
         Key: {
           tenant_id: tenant_id,
@@ -22,16 +22,16 @@ exports.lambda_handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: {
-        message: "Producto encontrado exitosamente",
-        item: response.Item || {},
+      body:{
+        message: "Inventory retrieved successfully",
+        items: response.Items || [], 
       },
     };
   } catch (error) {
     return {
       statusCode: 500,
       body: {
-        error: error.message || "Ocurrió un error al obtener el producto",
+        error: error.message || "An error occurred while retrieving the inventory",
       },
     };
   }

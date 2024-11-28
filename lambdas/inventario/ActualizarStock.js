@@ -12,38 +12,38 @@ exports.lambda_handler = async (event) => {
 
     await dynamo.send(
       new UpdateCommand({
-        TableName: "pf_inventario",
+        TableName: "pf_inventarios",
         Key: {
           tenant_id: inventoryData.tenant_id,
-          ip_id: `${inventoryData.inventory_id}#${inventoryData.product_id}`,
+          ip_id: `${inventoryData.inventory_id}#${inventoryData.product_id}`, 
         },
         UpdateExpression: `
           SET 
-            stock = if_not_exists(stock, 0) + :new_stock,
+            stock = if_not_exists(stock, :new_stock) + :new_stock,
             observaciones = :new_observaciones,
             last_modification = :last_modification
         `,
         ExpressionAttributeValues: {
           ":new_stock": inventoryData.stock,
-          ":new_observaciones": inventoryData.observaciones || "",
+          ":new_observaciones": inventoryData.observaciones || null,
           ":last_modification": lastModification,
         },
-        ReturnValues: "UPDATED_NEW",
       })
     );
 
     return {
       statusCode: 200,
       body: {
-        message: "Stock actualizado exitosamente",
+        message: "Stock updated successfully",
       },
     };
   } catch (error) {
     return {
       statusCode: 500,
       body: {
-        error: error.message || "Ocurrió un error al actualizar el stock",
+        error: error.message || "An error occurred while updating the inventory",
       },
     };
   }
 };
+

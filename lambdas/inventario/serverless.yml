@@ -22,7 +22,7 @@ functions:
 
 
   listar_productos_inventorio:
-    handler: ListarInventorio.lambda_handler
+    handler: ListarInventario.lambda_handler
     memorySize: 512
     events:
       - http:
