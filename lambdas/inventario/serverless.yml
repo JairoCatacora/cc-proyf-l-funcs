@@ -12,7 +12,6 @@ provider:
 functions:
   crear_inventario:
     handler: CrearInventario.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /inventory/create
@@ -72,7 +71,6 @@ functions:
 
   inventario_nombre:
     handler: GetInventariosNombres.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /inventory/names

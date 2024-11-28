@@ -7,13 +7,12 @@ const dynamo = DynamoDBDocumentClient.from(client);
 exports.lambda_handler = async (event) => {
   try {
     const tenant_id = event.query.tenant_id;
-    const inventory_id = event.query.inventory_id;
 
-    if (!tenant_id || !inventory_id) {
+    if (!tenant_id) {
       return {
         statusCode: 400,
         body: {
-          message: "tenant_id and inventory_id are required"
+          message: "tenant_id is required"
         }
       };
     }
