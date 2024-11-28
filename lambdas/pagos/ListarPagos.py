@@ -2,8 +2,8 @@ import boto3
 import json
 
 def lambda_handler(event, context):
-    tenant_id = event['query'].get('tenant_id')
-    user_id = event['query'].get('user_id')
+    tenant_id = event['query']['tenant_id']
+    user_id = event['query']['user_id']
 
     if not tenant_id and not user_id:
         return {
@@ -14,23 +14,10 @@ def lambda_handler(event, context):
     try:
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table('pf_pagos')
-
-        filter_expression = []
-        expression_attribute_values = {}
-
-        if tenant_id:
-            filter_expression.append('tenant_id = :tenant_id')
-            expression_attribute_values[':tenant_id'] = tenant_id
-
-        if user_id:
-            filter_expression.append('user_id = :user_id')
-            expression_attribute_values[':user_id'] = user_id
-
-        filter_expression = " AND ".join(filter_expression)
-
-        response = table.scan(
-            FilterExpression=filter_expression,
-            ExpressionAttributeValues=expression_attribute_values
+        
+        response = table.query(
+            IndexName='tenant_id-user_id-index',
+            KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('user_id').eq(user_id)
         )
 
         pagos = response.get('Items', [])

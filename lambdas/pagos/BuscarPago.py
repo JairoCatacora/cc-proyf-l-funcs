@@ -3,35 +3,21 @@ import json
 
 def lambda_handler(event, context):
     try:
-        query_params = event.get('queryStringParameters', {})
-        product_name = query_params.get('product_name')
-        product_brand = query_params.get('product_brand')
+        user_id = event['query']['user_id']
+        pago_id = event['query']['pago_id']
 
-        if not product_name and not product_brand:
+        if not user_id and not pago_id:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'message': 'Debe proporcionar product_name o product_brand para la búsqueda'})
+                'body': {'message': 'Debe proporcionar product_name o product_brand para la búsqueda'}
             }
 
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table('pf_pagos')
 
-        filter_expression = []
-        expression_attribute_values = {}
-
-        if product_name:
-            filter_expression.append('product_name = :product_name')
-            expression_attribute_values[':product_name'] = product_name
-
-        if product_brand:
-            filter_expression.append('product_brand = :product_brand')
-            expression_attribute_values[':product_brand'] = product_brand
-
-        filter_expression = " AND ".join(filter_expression)
-
-        response = table.scan(
-            FilterExpression=filter_expression,
-            ExpressionAttributeValues=expression_attribute_values
+        response = table.query(
+            IndexName='user_id-pago_id-index',
+            KeyConditionExpression=Key('user_id').eq(user_id) & Key('pago_id').eq(pago_id)
         )
 
         pagos = response.get('Items', [])
