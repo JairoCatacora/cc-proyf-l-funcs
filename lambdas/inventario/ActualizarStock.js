@@ -12,7 +12,7 @@ exports.lambda_handler = async (event) => {
 
     await dynamo.send(
       new UpdateCommand({
-        TableName: "pf_inventarios",
+        TableName: "pf_inventario",
         Key: {
           tenant_id: inventoryData.tenant_id,
           ip_id: `${inventoryData.inventory_id}#${inventoryData.product_id}`,

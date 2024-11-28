@@ -12,7 +12,7 @@ exports.lambda_handler = async (event) => {
 
     await dynamo.send(
       new DeleteCommand({
-        TableName: "pf_inventarios",
+        TableName: "pf_inventario",
         Key: {
           tenant_id: tenant_id,
           ip_id: `${inventory_id}#${product_id}`,

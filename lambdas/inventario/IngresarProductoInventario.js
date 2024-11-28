@@ -12,12 +12,12 @@ exports.lambda_handler = async (event) => {
 
     await dynamo.send(
       new PutCommand({
-        TableName: "pf_inventarios",
+        TableName: "pf_inventario",
         Item: {
           tenant_id: inventoryData.tenant_id,
           ip_id: `${inventoryData.inventory_id}#${inventoryData.product_id}`,
           inventory_id: inventoryData.inventory_id,
-          product_id: inventoryData.product_id,
+          product_id: inventoryData.product_id, 
           stock: inventoryData.stock,
           last_modification: lastModification,
           observaciones: inventoryData.observaciones || null,
@@ -27,16 +27,16 @@ exports.lambda_handler = async (event) => {
 
     return {
       statusCode: 201,
-      body: JSON.stringify({
+      body: {
         message: "Inventory created successfully",
-      }),
+      },
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
+      body: {
         error: error.message || "An error occurred while creating the inventory",
-      }),
+      },
     };
   }
 };
