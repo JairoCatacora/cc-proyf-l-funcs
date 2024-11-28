@@ -4,7 +4,7 @@ service: api-customization
 provider:
   name: aws
   runtime: python3.12
-  memorySize: 256
+  memorySize: 1024
   timeout: 30
   iam:
     role: arn:aws:iam::943073974505:role/LabRole

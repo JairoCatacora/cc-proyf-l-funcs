@@ -15,6 +15,7 @@ def lambda_handler(event, context):
         user_id = event['body']['user_id']
         user_info = event['body']['user_info']
         product_list = event['body']['products']
+        inventory_id = event['body']['inventory_id']
         creation_date = datetime.now()
         shipping_date = creation_date + timedelta(days=7)
 
@@ -24,6 +25,12 @@ def lambda_handler(event, context):
                 "body": {"message": "La lista de productos no puede estar vacía."}
             }
 
+        if not tenant_id and order_id and user_id and user_info and inventory_id :
+            return {
+                "statusCode": 400,
+                "body": {"message": "All parameters must be present"}
+            }
+
         total_price = Decimal(0)
         for product in product_list:
             product_id = product['product_id']
@@ -31,11 +38,34 @@ def lambda_handler(event, context):
 
             url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/product/search?tenant_id={tenant_id}&product_id={product_id}"
             response = http.request('GET', url)
+            
+            url2 = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/inventory/update"
+            info = {
+                "tenant_id": tenant_id,
+                "inventory_id": inventory_id,
+                "product_id": product_id,
+                "cantidad":quantity,
+                "observaciones":"venta",
+                "add":False
+            }
+            encoded_body = json.dumps(info)
+
+            response2 = http.request(
+                "PATCH",
+                url2,
+                body=encoded_body,
+                headers={'Content-Type': 'application/json'}
+            )
 
             if response.status != 200:
                 return {
                     "statusCode": 404,
                     "body": {"message": f"No se encontró información para el producto con ID {product_id}"}
+                }
+            if response2.status != 200:
+                return {
+                    "statusCode": 404,
+                    "body": {"message": f"No se pudo actualizar el stock para el producto con ID {product_id}"}
                 }
 
             product_data = json.loads(response.data.decode('utf-8'))['body']
@@ -48,6 +78,7 @@ def lambda_handler(event, context):
                 "order_id" : order_id,
                 "user_id": user_id,
                 "user_info": user_info,
+                "inventory_id": inventory_id,
                 "creation_date": creation_date.isoformat(),
                 "shipping_date": shipping_date.isoformat(),
                 'order_status': 'PENDING',

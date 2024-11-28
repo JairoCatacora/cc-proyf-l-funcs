@@ -34,7 +34,6 @@ def lambda_handler(event, context):
         order_data = search_response['body']['orders'][0]
         total = Decimal(str(order_data['total_price']))
 
-
         table_payments.put_item(
             Item={
                 'tenant_id': tenant_id,
@@ -47,7 +46,7 @@ def lambda_handler(event, context):
             }
         )
 
-        url = f"https://4lnj7a6xu8.execute-api.us-east-1.amazonaws.com/dev/orden/update"
+        url2 = f"https://4lnj7a6xu8.execute-api.us-east-1.amazonaws.com/dev/orden/update"
         update = {
             "tenant_id": tenant_id,
             "order_id": order_id,
@@ -57,7 +56,7 @@ def lambda_handler(event, context):
 
         response = http.request(
             "PATCH",
-            url,
+            url2,
             body=encoded_body,
             headers={'Content-Type': 'application/json'}
         )
