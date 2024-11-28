@@ -15,7 +15,8 @@ provider:
 functions:
   # GET /customization/{tenant_id}
   getCustomization:
-    handler: get_customization.handler
+    runtime: nodejs22.x
+    handler: getCustomization.handler
     events:
       - http:
           path: /customization/{tenant_id}
@@ -25,7 +26,7 @@ functions:
 
   # PATCH /customization/{tenant_id}
   updateCustomization:
-    handler: update_customization.lambda_handler
+    handler: updateCustomization.lambda_handler
     events:
       - http:
           path: /customization/{tenant_id}
@@ -35,7 +36,7 @@ functions:
 
   # POST /customization
   createCustomization:
-    handler: create_customization.lambda_handler
+    handler: createCustomization.lambda_handler
     events:
       - http:
           path: /customization
@@ -45,7 +46,8 @@ functions:
 
   # DELETE /customization/{tenant_id}
   deleteCustomization:
-    handler: delete_customization.handler
+    runtime: nodejs22.x
+    handler: deleteCustomization.handler
     events:
       - http:
           path: /customization/{tenant_id}
@@ -55,7 +57,7 @@ functions:
 
   # POST /customization/upload-logo
   uploadLogo:
-    handler: upload_logo.lambda_handler
+    handler: uploadLogo.lambda_handler
     memorySize: 512
     events:
       - http:
@@ -65,8 +67,9 @@ functions:
           integration: lambda
 
   # GET /customization/list-logos
-  listTenantLogos:
-    handler: list_tenant_logos.handler
+  getTenantLogos:
+    runtime: nodejs22.x
+    handler: getTenantLogos.handler
     events:
       - http:
           path: /customization/list-logos
