@@ -46,7 +46,7 @@ functions:
     events:
       - http:
           path: /inventory/update
-          method: put
+          method: patch
           cors: true
           integration: lambda
 
