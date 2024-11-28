@@ -8,7 +8,7 @@ exports.lambda_handler = async (event) => {
   try {
     const { tenant_id } = event.query.tenant_id;
     const { product_id } = event.query.product_id;
-    const { inventory_id } = event.inventory_id;
+    const { inventory_id } = event.query.inventory_id;
 
     const response = await dynamo.send(
       new QueryCommand({
