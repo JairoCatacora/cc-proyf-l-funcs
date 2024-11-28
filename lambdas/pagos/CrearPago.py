@@ -38,12 +38,12 @@ def lambda_handler(event, context):
         )
 
         url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/orden/update"
-        body = {
+        update = {
             "tenant_id": tenant_id,
             "order_id": order_id,
             "order_status": 'APPROVED PAYMENT'
         }
-        encoded_body = json.dumps(body)
+        encoded_body = json.dumps(update)
 
         response = http.request(
             "PATCH",
