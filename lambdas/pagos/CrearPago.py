@@ -23,8 +23,17 @@ def lambda_handler(event, context):
 
         url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/orden/search?user_id={user_id}&order_id={order_id}"
         response = http.request('GET', url)
-        product_data = json.loads(response.data.decode('utf-8'))['body']
-        total = Decimal(str(product_data['total_price']))
+        search_response = json.loads(response.data.decode('utf-8'))
+
+        if search_response.get('statusCode') != 200 or not search_response['body'].get('orders'):
+            return {
+                'statusCode': 404,
+                'body': {'message': 'Orden no encontrada o error en el servicio de búsqueda.'}
+            }
+
+        order_data = search_response['body']['orders'][0]
+        total = Decimal(str(order_data['total_price']))
+
 
         table_payments.put_item(
             Item={
