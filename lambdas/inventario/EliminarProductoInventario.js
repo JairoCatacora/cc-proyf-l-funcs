@@ -6,9 +6,15 @@ const dynamo = DynamoDBDocumentClient.from(client);
 
 exports.lambda_handler = async (event) => {
   try {
-    const { tenant_id } = event.query.tenant_id;
-    const { product_id } = event.query.product_id;
-    const { inventory_id } = event.inventory_id;
+    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+    const { tenant_id, product_id, inventory_id } = body;
+
+    if (!tenant_id || !product_id || !inventory_id) {
+      return {
+        statusCode: 400,
+        body: { message: "tenant_id, product_id, and inventory_id are required" },
+      };
+    }
 
     await dynamo.send(
       new DeleteCommand({
@@ -30,7 +36,7 @@ exports.lambda_handler = async (event) => {
     return {
       statusCode: 500,
       body: {
-        error: error.message || "Ocurrió un error al eliminar el producto",
+        error: error.message, message: "Ocurrió un error al eliminar el producto",
       },
     };
   }

@@ -6,8 +6,17 @@ const dynamo = DynamoDBDocumentClient.from(client);
 
 exports.lambda_handler = async (event) => {
   try {
-    const { tenant_id } = event.query.tenant_id;
-    const { inventory_id } = event.query.inventory_id;
+    const tenant_id = event.query.tenant_id;
+    const inventory_id = event.query.inventory_id;
+
+    if (!tenant_id || !inventory_id) {
+      return {
+        statusCode: 400,
+        body: {
+          message: "tenant_id and inventory_id are required"
+        }
+      };
+    }
 
     const response = await dynamo.send(
       new QueryCommand({
@@ -21,19 +30,26 @@ exports.lambda_handler = async (event) => {
       })
     );
 
-    return {
-      statusCode: 200,
-      body: {
-        message: "Inventario listado exitosamente",
-        items: response.Items || [],
-      },
-    };
+    if (response.Items && response.Items.length > 0) {
+      return {
+        statusCode: 200,
+        body: response.Items
+      };
+    } else {
+      return {
+        statusCode: 404,
+        body: {
+          message: "No inventory found"
+        }
+      };
+    }
   } catch (error) {
+    console.error(error);
     return {
       statusCode: 500,
       body: {
-        error: error.message || "Ocurrió un error al listar el inventario",
-      },
+        error: error.message || "An error occurred while listing the inventory"
+      }
     };
   }
 };

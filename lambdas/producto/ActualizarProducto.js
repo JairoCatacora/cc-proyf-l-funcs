@@ -7,9 +7,9 @@ const dynamo = DynamoDBDocumentClient.from(client);
 exports.lambda_handler = async (event) => {
   try {
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-    const { tenant_id, product_id, product_name, product_brand, product_info, product_price, product_stock } = body;
+    const { tenant_id, product_id, product_name, product_brand, product_info, product_price } = body;
 
-    if (!tenant_id || !product_id || !product_name || !product_brand || !product_price || !product_stock) {
+    if (!tenant_id || !product_id || !product_name || !product_brand || !product_price ) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Missing required fields" }),
@@ -20,7 +20,7 @@ exports.lambda_handler = async (event) => {
       TableName: "pf_productos",
       Key: { tenant_id, product_id },
       UpdateExpression:
-        "SET product_name = :name, product_brand = :brand, product_info = :info, product_price = :price, product_stock = :stock",
+        "SET product_name = :name, product_brand = :brand, product_info = :info, product_price = :price",
       ExpressionAttributeValues: {
         ":name": product_name,
         ":brand": product_brand,
