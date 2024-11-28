@@ -40,6 +40,7 @@ def lambda_handler(event, context):
                 'tenant_id': tenant_id,
                 'pago_id': pago_id, 
                 'order_id': order_id,
+                'user_id' : user_id,
                 'total': total,
                 'fecha_pago': fecha_pago,
                 'user_info': user_info
