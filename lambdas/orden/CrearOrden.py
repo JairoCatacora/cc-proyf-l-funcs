@@ -19,16 +19,16 @@ def lambda_handler(event, context):
         creation_date = datetime.now()
         shipping_date = creation_date + timedelta(days=7)
 
+        if not (tenant_id and order_id and user_id and user_info and inventory_id and product_list):
+            return {
+                "statusCode": 400,
+                "body": {"message": "Todos los parámetros deben estar presentes."}
+            }
+
         if not product_list:
             return {
                 "statusCode": 400,
                 "body": {"message": "La lista de productos no puede estar vacía."}
-            }
-
-        if not tenant_id and order_id and user_id and user_info and inventory_id :
-            return {
-                "statusCode": 400,
-                "body": {"message": "All parameters must be present"}
             }
 
         total_price = Decimal(0)
@@ -38,15 +38,24 @@ def lambda_handler(event, context):
 
             url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/product/search?tenant_id={tenant_id}&product_id={product_id}"
             response = http.request('GET', url)
-            
+
+            if response.status != 200:
+                return {
+                    "statusCode": 404,
+                    "body": {"message": f"No se encontró información para el producto con ID {product_id}"}
+                }
+
+            product_data = json.loads(response.data.decode('utf-8'))['body']
+            price = Decimal(str(product_data['product_price']))
+
             url2 = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/inventory/update"
             info = {
                 "tenant_id": tenant_id,
                 "inventory_id": inventory_id,
                 "product_id": product_id,
-                "cantidad":quantity,
-                "observaciones":"venta",
-                "add":False
+                "cantidad": float(quantity),
+                "observaciones": "venta",
+                "add": False
             }
             encoded_body = json.dumps(info)
 
@@ -57,43 +66,43 @@ def lambda_handler(event, context):
                 headers={'Content-Type': 'application/json'}
             )
 
-            if response.status != 200:
-                return {
-                    "statusCode": 404,
-                    "body": {"message": f"No se encontró información para el producto con ID {product_id}"}
-                }
             if response2.status != 200:
                 return {
                     "statusCode": 404,
-                    "body": {"message": f"No se pudo actualizar el stock para el producto con ID {product_id}"}
+                    "body":{"message": f"No se pudo actualizar el stock para el producto con ID {product_id}"}
                 }
 
-            product_data = json.loads(response.data.decode('utf-8'))['body']
-            price = Decimal(str(product_data['product_price']))
             total_price += price * quantity
 
         table.put_item(
             Item={
                 "tenant_id": tenant_id,
-                "order_id" : order_id,
+                "order_id": order_id,
                 "user_id": user_id,
                 "user_info": user_info,
                 "inventory_id": inventory_id,
                 "creation_date": creation_date.isoformat(),
                 "shipping_date": shipping_date.isoformat(),
-                'order_status': 'PENDING',
+                "order_status": "PENDING",
                 "products": product_list,
-                "total_price": Decimal(str(total_price))
+                "total_price": float(total_price) 
             }
         )
 
         return {
             "statusCode": 201,
-            "body": {"message": "Orden creada exitosamente", "order_id": order_id, "total_price": float(total_price)}
+            "body": json.dumps({
+                "message": "Orden creada exitosamente",
+                "order_id": order_id,
+                "total_price": float(total_price) 
+            })
         }
 
     except Exception as e:
         return {
             "statusCode": 500,
-            "body": {"message": "Error al crear la orden", "error": str(e)}
+            "body": {
+                "message": "Error al crear la orden",
+                "error": str(e)
+            }
         }
