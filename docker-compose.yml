@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  swagger-usuarios:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-usuarios
+    ports:
+      - "8081:8080"
+    environment:
+      SWAGGER_JSON: /app/swagger.yaml
+    volumes:
+      - ./usuarios/swagger.yaml:/app/swagger.yaml
+
+  swagger-productos:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-productos
+    ports:
+      - "8082:8080"
+    environment:
+      SWAGGER_JSON: /app/swagger.yaml
+    volumes:
+      - ./productos/swagger.yaml:/app/swagger.yaml
+
+swagger-orden:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-orden
+    ports:
+      - "8083:8080"
+    environment:
+      SWAGGER_JSON: /app/swagger.yaml
+    volumes:
+      - ./orden/swagger.yaml:/app/swagger.yaml
