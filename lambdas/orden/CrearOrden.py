@@ -53,7 +53,7 @@ def lambda_handler(event, context):
                 "tenant_id": tenant_id,
                 "inventory_id": inventory_id,
                 "product_id": product_id,
-                "cantidad": float(quantity),
+                "cantidad": int(quantity),
                 "observaciones": "venta",
                 "add": False
             }
