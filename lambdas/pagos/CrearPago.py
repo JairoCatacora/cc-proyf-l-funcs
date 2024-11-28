@@ -10,7 +10,6 @@ http = urllib3.PoolManager()
 
 def lambda_handler(event, context):
     try:
-        # Verifica si 'body' está presente y es una cadena que necesita ser convertida a un diccionario
         if isinstance(event['body'], str):
             event['body'] = json.loads(event['body'])
 
@@ -22,17 +21,15 @@ def lambda_handler(event, context):
 
         fecha_pago = datetime.utcnow().isoformat()
 
-        # Realiza la llamada GET al endpoint de la orden
         url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/orden/search?user_id={user_id}&order_id={order_id}"
         response = http.request('GET', url)
         product_data = json.loads(response.data.decode('utf-8'))['body']
-        total = Decimal(str(product_data['total_price']))  # Corregido el nombre del campo
+        total = Decimal(str(product_data['total_price']))
 
-        # Inserta el pago en DynamoDB
         table_payments.put_item(
             Item={
                 'tenant_id': tenant_id,
-                'pago_id': pago_id,  # Corrección aquí: cambia 'payment_id' a 'pago_id'
+                'pago_id': pago_id, 
                 'order_id': order_id,
                 'total': total,
                 'fecha_pago': fecha_pago,
@@ -40,7 +37,6 @@ def lambda_handler(event, context):
             }
         )
 
-        # Llamada POST para actualizar el estado de la orden
         url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/orden/update"
         body = {
             "tenant_id": tenant_id,
@@ -50,7 +46,7 @@ def lambda_handler(event, context):
         encoded_body = json.dumps(body)
 
         response = http.request(
-            "POST",
+            "PATCH",
             url,
             body=encoded_body,
             headers={'Content-Type': 'application/json'}
