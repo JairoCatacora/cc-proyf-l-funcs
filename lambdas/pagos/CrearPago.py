@@ -21,7 +21,7 @@ def lambda_handler(event, context):
 
         fecha_pago = datetime.utcnow().isoformat()
 
-        url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/orden/search?user_id={user_id}&order_id={order_id}"
+        url = f"https://4lnj7a6xu8.execute-api.us-east-1.amazonaws.com/dev/orden/search?user_id={user_id}&order_id={order_id}"
         response = http.request('GET', url)
         search_response = json.loads(response.data.decode('utf-8'))
 
@@ -46,7 +46,7 @@ def lambda_handler(event, context):
             }
         )
 
-        url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/orden/update"
+        url = f"https://4lnj7a6xu8.execute-api.us-east-1.amazonaws.com/dev/orden/update"
         update = {
             "tenant_id": tenant_id,
             "order_id": order_id,
