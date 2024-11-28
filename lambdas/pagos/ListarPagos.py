@@ -26,10 +26,10 @@ def lambda_handler(event, context):
         if pagos:
             return {
                 'statusCode': 200,
-                'body': json.dumps({
+                'body': {
                     'message': 'Pagos encontrados',
                     'pagos': pagos
-                })
+                }
             }
         else:
             return {
