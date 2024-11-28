@@ -1,5 +1,6 @@
 import boto3
 import json
+from boto3.dynamodb.conditions import Key
 
 def lambda_handler(event, context):
     tenant_id = event['query']['tenant_id']
