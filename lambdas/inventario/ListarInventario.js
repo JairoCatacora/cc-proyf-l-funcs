@@ -1,36 +1,39 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, GetCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
 exports.lambda_handler = async (event) => {
   try {
-    const { inventory_id, tenant_id } = event.queryStringParameters;
+    const { tenant_id } = event.query.tenant_id;
+    const { inventory_id } = event.query.inventory_id;
 
     const response = await dynamo.send(
-      new GetCommand({
+      new QueryCommand({
         TableName: "pf_inventarios",
-        Key: {
-          inventory_id: inventory_id,
-          tenant_id: tenant_id,
+        IndexName: "tenant_id-inventory_id-index",
+        KeyConditionExpression: "tenant_id = :tenant_id AND inventory_id = :inventory_id",
+        ExpressionAttributeValues: {
+          ":tenant_id": tenant_id,
+          ":inventory_id": inventory_id,
         },
       })
     );
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        message: "Inventory retrieved successfully",
-        inventory: response.Item || {},
-      }),
+      body: {
+        message: "Inventario listado exitosamente",
+        items: response.Items || [],
+      },
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: error.message || "An error occurred while retrieving the inventory",
-      }),
+      body: {
+        error: error.message || "Ocurrió un error al listar el inventario",
+      },
     };
   }
 };

@@ -8,14 +8,19 @@ exports.lambda_handler = async (event) => {
   try {
     const inventoryData = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
 
+    const lastModification = new Date().toISOString();
+
     await dynamo.send(
       new PutCommand({
         TableName: "pf_inventarios",
         Item: {
           tenant_id: inventoryData.tenant_id,
+          ip_id: `${inventoryData.inventory_id}#${inventoryData.product_id}`,
           inventory_id: inventoryData.inventory_id,
           product_id: inventoryData.product_id,
-          stock: inventoryData.stock
+          stock: inventoryData.stock,
+          last_modification: lastModification,
+          observaciones: inventoryData.observaciones || null,
         },
       })
     );

@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, GetCommand } = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
@@ -10,8 +10,8 @@ exports.lambda_handler = async (event) => {
     const { product_id } = event.query.product_id;
     const { inventory_id } = event.inventory_id;
 
-    await dynamo.send(
-      new DeleteCommand({
+    const response = await dynamo.send(
+      new GetCommand({
         TableName: "pf_inventarios",
         Key: {
           tenant_id: tenant_id,
@@ -22,15 +22,16 @@ exports.lambda_handler = async (event) => {
 
     return {
       statusCode: 200,
-      body:{
-        message: "Producto eliminado exitosamente del inventario",
+      body: {
+        message: "Producto encontrado exitosamente",
+        item: response.Item || {},
       },
     };
   } catch (error) {
     return {
       statusCode: 500,
       body: {
-        error: error.message || "Ocurrió un error al eliminar el producto",
+        error: error.message || "Ocurrió un error al obtener el producto",
       },
     };
   }

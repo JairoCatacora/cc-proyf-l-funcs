@@ -8,39 +8,42 @@ exports.lambda_handler = async (event) => {
   try {
     const inventoryData = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
 
+    const lastModification = new Date().toISOString();
+
     await dynamo.send(
       new UpdateCommand({
         TableName: "pf_inventarios",
         Key: {
-          inventory_id: inventoryData.inventory_id,
           tenant_id: inventoryData.tenant_id,
+          ip_id: `${inventoryData.inventory_id}#${inventoryData.product_id}`,
         },
         UpdateExpression: `
           SET 
-            product_id = if_not_exists(product_id, :product_id),
-            stock = if_not_exists(stock, :new_stock) + :new_stock,
-            location = :location
+            stock = if_not_exists(stock, 0) + :new_stock,
+            observaciones = :new_observaciones,
+            last_modification = :last_modification
         `,
         ExpressionAttributeValues: {
-          ":product_id": inventoryData.product_id,
           ":new_stock": inventoryData.stock,
-          ":location": inventoryData.location,
+          ":new_observaciones": inventoryData.observaciones || "",
+          ":last_modification": lastModification,
         },
+        ReturnValues: "UPDATED_NEW",
       })
     );
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        message: "Product added/updated in inventory successfully",
-      }),
+      body: {
+        message: "Stock actualizado exitosamente",
+      },
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: error.message || "An error occurred while updating the inventory",
-      }),
+      body: {
+        error: error.message || "Ocurrió un error al actualizar el stock",
+      },
     };
   }
 };

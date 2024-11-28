@@ -10,23 +10,33 @@ provider:
     role: arn:aws:iam::943073974505:role/LabRole
 
 functions:
-  crear_inventorio:
-    handler: CrearInventorio.lambda_handler
+  register_producto_stock:
+    handler: IngresarProductoInventario.lambda_handler
     memorySize: 512
     events:
       - http:
-          path: /inventory/create
+          path: /inventory/register
           method: post
           cors: true
           integration: lambda
 
 
-  listar_inventorio:
+  listar_productos_inventorio:
     handler: ListarInventorio.lambda_handler
     memorySize: 512
     events:
       - http:
           path: /inventory/list
+          method: get
+          cors: true
+          integration: lambda
+
+  get_stock:
+    handler: GetStock.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /inventory/product
           method: get
           cors: true
           integration: lambda
