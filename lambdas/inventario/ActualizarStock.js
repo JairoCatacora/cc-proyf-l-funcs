@@ -5,29 +5,6 @@ const https = require("https");
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
-function fetchCurrentStock(apiUrl) {
-  return new Promise((resolve, reject) => {
-    https.get(apiUrl, (res) => {
-      let data = "";
-
-      res.on("data", (chunk) => {
-        data += chunk;
-      });
-
-      res.on("end", () => {
-        try {
-          const parsedData = JSON.parse(data);
-          resolve(parsedData);
-        } catch (error) {
-          reject(new Error("Error parsing response from API"));
-        }
-      });
-    }).on("error", (err) => {
-      reject(err);
-    });
-  });
-}
-
 exports.lambda_handler = async (event) => {
   try {
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
@@ -37,21 +14,34 @@ exports.lambda_handler = async (event) => {
     if (!tenant_id || !inventory_id || !product_id || cantidad === undefined || observaciones === undefined || add === undefined) {
       return {
         statusCode: 400,
-        body:{ message: "Missing required fields" },
+        body: { message: "Missing required fields" },
       };
     }
 
     const apiUrl = `https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/inventory/product?tenant_id=${tenant_id}&product_id=${product_id}&inventory_id=${inventory_id}`;
-    const response = await fetchCurrentStock(apiUrl);
 
-    const currentStock = response?.stock;
-
-    if (currentStock === undefined) {
-      return {
-        statusCode: 404,
-        body: { message: "Item not found in inventory" },
-      };
-    }
+    const currentStock = await new Promise((resolve, reject) => {
+      https.get(apiUrl, (res) => {
+        let data = "";
+        res.on("data", (chunk) => {
+          data += chunk;
+        });
+        res.on("end", () => {
+          try {
+            const result = JSON.parse(data);
+            if (result.body && result.body.item) {
+              resolve(result.body.item.stock); 
+            } else {
+              reject(new Error("Item not found in inventory response"));
+            }
+          } catch (err) {
+            reject(err);
+          }
+        });
+      }).on("error", (err) => {
+        reject(err);
+      });
+    });
 
     if (!add && currentStock < cantidad) {
       return {
@@ -69,10 +59,10 @@ exports.lambda_handler = async (event) => {
         ip_id: `${inventory_id}#${product_id}`,
       },
       UpdateExpression: `
-          SET 
-          stock = stock ${add ? "+" : "-"} :cantidad,
-          observaciones = :observaciones,
-          last_modification = :last_modification
+        SET 
+        stock = stock ${add ? "+" : "-"} :cantidad,
+        observaciones = :observaciones,
+        last_modification = :last_modification
       `,
       ExpressionAttributeValues: {
         ":cantidad": Number(cantidad),
