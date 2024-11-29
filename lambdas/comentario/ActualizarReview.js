@@ -9,9 +9,9 @@ exports.lambda_handler = async (event) => {
   try {
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
     const lastModification = new Date().toISOString();
-    const {tenant_id, product_id, review_id, user_id, comment, stars} = body
+    const {tenant_id, product_id, review_id, user_id, comentario, stars} = body
 
-    if (!tenant_id || !product_id || !review_id || !user_id || comment === undefined || stars === undefined) {
+    if (!tenant_id || !product_id || !review_id || !user_id || comentario === undefined || stars === undefined) {
       return {
         statusCode: 400,
         body: { message: "Missing required fields" },
@@ -26,13 +26,13 @@ exports.lambda_handler = async (event) => {
       },
       UpdateExpression: `
         SET 
-        comment = :comment,
+        comentario = :comentario,
         stars = :stars,
         last_modification = :last_modification
       `,
       ExpressionAttributeValues: {
         ":stars": Number(stars),
-        ":comment": comment,
+        ":comentario": comentario,
         ":last_modification": lastModification,
       },
       ReturnValues: "UPDATED_NEW",
