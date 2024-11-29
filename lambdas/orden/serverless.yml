@@ -12,7 +12,6 @@ provider:
 functions:
   crear_orden:
     handler: CrearOrden.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /orden/create
@@ -22,7 +21,6 @@ functions:
 
   buscar_ordenes:
     handler: BuscarOrden.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /orden/search
@@ -32,7 +30,6 @@ functions:
 
   actualizar_orden:
     handler: ActualizarOrden.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /orden/update
@@ -42,7 +39,6 @@ functions:
 
   list_orden:
     handler: ListarOrden.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /orden/list

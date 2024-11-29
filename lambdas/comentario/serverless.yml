@@ -4,7 +4,7 @@ service: serviciocliente
 provider:
   name: aws
   runtime: python3.12
-  memorySize: 256
+  memorySize: 1024
   timeout: 30
   iam:
     role: arn:aws:iam::943073974505:role/LabRole
@@ -12,7 +12,6 @@ provider:
 functions:
   crear_review:
     handler: CrearReview.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /review/create
@@ -21,8 +20,7 @@ functions:
           integration: lambda
 
   listar_reviews:
-    handler: ListarReviews.lambda_handler
-    memorySize: 512
+    handler: ListarReview.lambda_handler
     events:
       - http:
           path: /review/list
@@ -30,9 +28,8 @@ functions:
           cors: true
           integration: lambda
 
-  answer_review:
-    handler: AnswerReview.lambda_handler
-    memorySize: 512
+  actualizar_review:
+    handler: ActializarReview.lambda_handler
     events:
       - http:
           path: /review/answer
@@ -42,7 +39,6 @@ functions:
 
   eliminar_review:
     handler: EliminarReview.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /review/delete
