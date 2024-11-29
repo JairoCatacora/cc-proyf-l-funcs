@@ -29,10 +29,10 @@ functions:
           integration: lambda
 
   actualizar_review:
-    handler: ActializarReview.lambda_handler
+    handler: ActualizarReview.lambda_handler
     events:
       - http:
-          path: /review/answer
+          path: /review/update
           method: patch
           cors: true
           integration: lambda
