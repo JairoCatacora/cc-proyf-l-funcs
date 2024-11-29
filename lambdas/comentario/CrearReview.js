@@ -7,7 +7,7 @@ const dynamo = DynamoDBDocumentClient.from(client);
 exports.lambda_handler = async (event) => {
   try {
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-    const {tenant_id, product_id, review_id, user_id, comment, stars, last_modification} = body
+    const {tenant_id, product_id, review_id, user_id, comment, stars} = body
 
     const lastModification = new Date().toISOString();
 
@@ -23,7 +23,7 @@ exports.lambda_handler = async (event) => {
           tp_id: `${tenant_id}#${product_id}`,
           comment: comment,
           stars: Number(stars),
-          last_modification:last_modification
+          last_modification:lastModification
         },
       })
     );
