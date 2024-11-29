@@ -10,6 +10,8 @@ http = urllib3.PoolManager()
 
 def lambda_handler(event, context):
     try:
+        print("Evento recibido:", event)
+        
         tenant_id = event['body']['tenant_id']
         order_id = event['body']['order_id']
         user_id = event['body']['user_id']
@@ -37,7 +39,11 @@ def lambda_handler(event, context):
             quantity = Decimal(product['quantity'])
 
             url = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/product/search?tenant_id={tenant_id}&product_id={product_id}"
+            print(f"Buscando producto con URL: {url}")
+            
             response = http.request('GET', url)
+
+            print(f"Respuesta del producto (Status: {response.status}): {response.data.decode('utf-8')}")
 
             if response.status != 200:
                 return {
@@ -49,6 +55,8 @@ def lambda_handler(event, context):
             price = Decimal(str(product_data['product_price']))
 
             url2 = f"https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/inventory/update"
+            print(f"Actualizando inventario con URL: {url2}")
+
             info = {
                 "tenant_id": tenant_id,
                 "inventory_id": inventory_id,
@@ -59,6 +67,8 @@ def lambda_handler(event, context):
             }
             encoded_body = json.dumps(info)
 
+            print(f"Payload para actualizar inventario: {encoded_body}")
+
             response2 = http.request(
                 "PATCH",
                 url2,
@@ -66,13 +76,29 @@ def lambda_handler(event, context):
                 headers={'Content-Type': 'application/json'}
             )
 
+            print(f"Respuesta de inventario (Status: {response2.status}): {response2.data.decode('utf-8')}")
+
             if response2.status != 200:
                 return {
                     "statusCode": 404,
-                    "body":{"message": f"No se pudo actualizar el stock para el producto con ID {product_id}"}
+                    "body": {"message": f"No se pudo actualizar el stock para el producto con ID {product_id}"}
                 }
 
             total_price += price * quantity
+
+        print("Guardando la orden en DynamoDB con datos:")
+        print({
+            "tenant_id": tenant_id,
+            "order_id": order_id,
+            "user_id": user_id,
+            "user_info": user_info,
+            "inventory_id": inventory_id,
+            "creation_date": creation_date.isoformat(),
+            "shipping_date": shipping_date.isoformat(),
+            "order_status": "PENDING",
+            "products": product_list,
+            "total_price": float(total_price)
+        })
 
         table.put_item(
             Item={
@@ -85,20 +111,21 @@ def lambda_handler(event, context):
                 "shipping_date": shipping_date.isoformat(),
                 "order_status": "PENDING",
                 "products": product_list,
-                "total_price": float(total_price) 
+                "total_price": float(total_price)
             }
         )
 
         return {
             "statusCode": 201,
-            "body": json.dumps({
+            "body":{
                 "message": "Orden creada exitosamente",
                 "order_id": order_id,
-                "total_price": float(total_price) 
-            })
+                "total_price": float(total_price)
+            }
         }
 
     except Exception as e:
+        print("Error en el procesamiento:", str(e))
         return {
             "statusCode": 500,
             "body": {
