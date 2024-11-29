@@ -1,9 +1,30 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
-const https = require("https");
+const { DynamoDBDocumentClient, GetCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
+
+async function getInventoryItem(tenant_id, inventory_id, product_id) {
+  if (!tenant_id || !inventory_id || !product_id) {
+    throw new Error("tenant_id, product_id, and inventory_id are required");
+  }
+
+  const response = await dynamo.send(
+    new GetCommand({
+      TableName: "pf_inventario",
+      Key: {
+        tenant_id: tenant_id,
+        ip_id: `${inventory_id}#${product_id}`,
+      },
+    })
+  );
+
+  if (!response.Item) {
+    throw new Error("Item not found in inventory");
+  }
+
+  return response.Item;
+}
 
 exports.lambda_handler = async (event) => {
   try {
@@ -18,30 +39,8 @@ exports.lambda_handler = async (event) => {
       };
     }
 
-    const apiUrl = `https://3j1d1u98t7.execute-api.us-east-1.amazonaws.com/dev/inventory/product?tenant_id=${tenant_id}&product_id=${product_id}&inventory_id=${inventory_id}`;
-
-    const currentStock = await new Promise((resolve, reject) => {
-      https.get(apiUrl, (res) => {
-        let data = "";
-        res.on("data", (chunk) => {
-          data += chunk;
-        });
-        res.on("end", () => {
-          try {
-            const result = JSON.parse(data);
-            if (result.body && result.body.item) {
-              resolve(result.body.item.stock); 
-            } else {
-              reject(new Error("Item not found in inventory response"));
-            }
-          } catch (err) {
-            reject(err);
-          }
-        });
-      }).on("error", (err) => {
-        reject(err);
-      });
-    });
+    const currentItem = await getInventoryItem(tenant_id, inventory_id, product_id);
+    const currentStock = currentItem.stock;
 
     if (!add && currentStock < cantidad) {
       return {

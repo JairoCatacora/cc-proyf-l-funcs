@@ -1,13 +1,40 @@
 import boto3
 import json
+from boto3.dynamodb.conditions import Key
 from datetime import datetime
-import urllib3
 from decimal import Decimal
 
 dynamodb = boto3.resource('dynamodb')
+table_orders = dynamodb.Table('pf_ordenes')
 table_payments = dynamodb.Table('pf_pagos')
-http = urllib3.PoolManager()
 
+def search_order(user_id, order_id):
+    if not user_id or not order_id:
+        raise ValueError("user_id y order_id son requeridos.")
+    
+    response = table_orders.query(
+        IndexName='user_id-order_id-index',
+        KeyConditionExpression=Key('user_id').eq(user_id) & Key('order_id').eq(order_id)
+    )
+    
+    if not response.get('Items'):
+        raise ValueError("Orden no encontrada.")
+    
+    return response['Items'][0]
+
+def update_order(tenant_id, order_id, order_status):
+    response = table_orders.update_item(
+        Key={
+            "tenant_id": tenant_id,
+            "order_id": order_id
+        },
+        UpdateExpression="SET order_status = :status",
+        ExpressionAttributeValues={
+            ":status": order_status
+        },
+        ReturnValues="UPDATED_NEW"
+    )
+    return response['Attributes']
 def lambda_handler(event, context):
     try:
         if isinstance(event['body'], str):
@@ -21,17 +48,14 @@ def lambda_handler(event, context):
 
         fecha_pago = datetime.utcnow().isoformat()
 
-        url = f"https://4lnj7a6xu8.execute-api.us-east-1.amazonaws.com/dev/orden/search?user_id={user_id}&order_id={order_id}"
-        response = http.request('GET', url)
-        search_response = json.loads(response.data.decode('utf-8'))
-
-        if search_response.get('statusCode') != 200 or not search_response['body'].get('orders'):
+        try:
+            order_data = search_order(user_id, order_id)
+        except ValueError as e:
             return {
                 'statusCode': 404,
-                'body': {'message': 'Orden no encontrada o error en el servicio de búsqueda.'}
+                'body': {'message': str(e)}
             }
 
-        order_data = search_response['body']['orders'][0]
         total = Decimal(str(order_data['total_price']))
 
         table_payments.put_item(
@@ -46,25 +70,13 @@ def lambda_handler(event, context):
             }
         )
 
-        url2 = f"https://4lnj7a6xu8.execute-api.us-east-1.amazonaws.com/dev/orden/update"
-        update = {
-            "tenant_id": tenant_id,
-            "order_id": order_id,
-            "order_status": 'APPROVED PAYMENT'
-        }
-        encoded_body = json.dumps(update)
-
-        response = http.request(
-            "PATCH",
-            url2,
-            body=encoded_body,
-            headers={'Content-Type': 'application/json'}
-        )
+        update_order(tenant_id, order_id, 'APPROVED PAYMENT')
 
         return {
             'statusCode': 201,
             'body': {'message': 'Payment created successfully', 'payment_id': pago_id}
         }
+
     except Exception as e:
         return {
             'statusCode': 500,
