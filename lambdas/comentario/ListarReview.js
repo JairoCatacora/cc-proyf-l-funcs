@@ -8,25 +8,24 @@ exports.lambda_handler = async (event) => {
   try {
     const tenant_id = event.query.tenant_id;
     const user_id = event.query.user_id;
-    const product_id = event.query.product_id;
 
-    if (!tenant_id || !user_id || product_id) {
+    if (!tenant_id || !user_id ) {
       return {
         statusCode: 400,
         body: {
-          message: "tenant_id, product_id, and inventory_id are required"
+          message: "tenant_id and user_id are required"
         }
       };
     }
 
     const response = await dynamo.send(
       new QueryCommand({
-        TableName: "pf_comentarios",
-        IndexName: "user_id-tp_id-index",
-        KeyConditionExpression: "user_id = :user_id AND tp_id = :tp_id",
+        TableName: "pf_comentario",
+        IndexName: "tenant_id-user_id-index",
+        KeyConditionExpression: "tenant_id = :tenant_id AND user_id = :user_id",
         ExpressionAttributeValues: {
+          ":tenant_id": tenant_id,
           ":user_id": user_id,
-          ":tp_id": `${tenant_id}#${product_id}`,
         },
       })
     );

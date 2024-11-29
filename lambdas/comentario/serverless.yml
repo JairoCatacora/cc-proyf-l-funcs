@@ -3,7 +3,7 @@ service: serviciocliente
 
 provider:
   name: aws
-  runtime: python3.12
+  runtime: nodejs20.x
   memorySize: 1024
   timeout: 30
   iam:

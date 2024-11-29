@@ -19,7 +19,7 @@ exports.lambda_handler = async (event) => {
     }
 
     const params = {
-      TableName: "pf_comentarios",
+      TableName: "pf_comentario",
       Key: {
         tenant_id: tenant_id,
         pr_id: `${product_id}#${review_id}`,

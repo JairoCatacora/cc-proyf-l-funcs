@@ -13,14 +13,13 @@ exports.lambda_handler = async (event) => {
 
     await dynamo.send(
       new PutCommand({
-        TableName: "pf_comentarios",
+        TableName: "pf_comentario",
         Item: {
           tenant_id: tenant_id,
           pr_id: `${product_id}#${review_id}`,
           product_id: product_id,
           review_id: review_id,
           user_id: user_id,
-          tp_id: `${tenant_id}#${product_id}`,
           comment: comment,
           stars: Number(stars),
           last_modification:lastModification
