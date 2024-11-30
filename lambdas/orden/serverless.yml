@@ -45,3 +45,12 @@ functions:
           method: get
           cors: true
           integration: lambda
+
+  delete_orden:
+    handler: EliminarOrden.lambda_handler
+    events:
+      - http:
+          path: /orden/delete
+          method: delete
+          cors: true
+          integration: lambda

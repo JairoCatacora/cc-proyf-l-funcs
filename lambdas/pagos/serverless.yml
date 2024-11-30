@@ -39,3 +39,13 @@ functions:
           method: get
           cors: true
           integration: lambda
+
+  delete_pago:
+    handler: EliminarPago.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /pago/delete
+          method: delete
+          cors: true
+          integration: lambda
