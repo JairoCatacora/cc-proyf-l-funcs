@@ -146,7 +146,7 @@ def lambda_handler(event, context):
                 "shipping_date": shipping_date.isoformat(),
                 "order_status": "PENDING",
                 "products": product_list,
-                "total_price": float(total_price)
+                "total_price": Decimal(str(total_price))
             }
         )
 
@@ -155,7 +155,7 @@ def lambda_handler(event, context):
             "body": {
                 "message": "Orden creada exitosamente",
                 "order_id": order_id,
-                "total_price": float(total_price)
+                "total_price": Decimal(str(total_price))
             }
         }
 
