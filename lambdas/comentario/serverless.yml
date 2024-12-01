@@ -9,7 +9,7 @@ provider:
   iam:
     role: ${env:LAB_ROLE_ARN}
   environment:
-    TABLE_NAME: pf_comentario
+    TABLE_NAME: arn:aws:iam::943073974505:role/LabRole
 
 functions:
   crear_review:
