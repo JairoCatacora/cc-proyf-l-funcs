@@ -4,6 +4,43 @@ const { DynamoDBDocumentClient, GetCommand, UpdateCommand } = require("@aws-sdk/
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
+const https = require('https');
+
+const validateToken = (token) => {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: '0w7xbgvz6f.execute-api.us-east-1.amazonaws.com',
+      path: '/test/token/validate',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, 
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      res.on('end', () => {
+        const response = JSON.parse(data);
+        if (res.statusCode === 200) {
+          resolve(response); 
+        } else {
+          reject(new Error(response.error || 'Token no válido')); 
+        }
+      });
+    });
+
+    req.on('error', (e) => {
+      reject(new Error(`Error en la validación del token: ${e.message}`));
+    });
+
+    req.end();
+  });
+};
+
 async function getInventoryItem(tenant_id, inventory_id, product_id) {
   if (!tenant_id || !inventory_id || !product_id) {
     throw new Error("tenant_id, product_id, and inventory_id are required");
@@ -28,6 +65,23 @@ async function getInventoryItem(tenant_id, inventory_id, product_id) {
 
 exports.lambda_handler = async (event) => {
   try {
+    const token = event.headers.Authorization?.split(' ')[1]; 
+    if (!token) {
+      return {
+        statusCode: 400,
+        body: { message: "Token is required" },
+      };
+    }
+
+    try {
+      await validateToken(token); 
+    } catch (error) {
+      return {
+        statusCode: 403,
+        body: { message: error.message },
+      };
+    }
+    
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
     const lastModification = new Date().toISOString();
     const { tenant_id, inventory_id, product_id, cantidad, observaciones, add } = body;

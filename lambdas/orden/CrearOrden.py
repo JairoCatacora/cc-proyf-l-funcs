@@ -2,11 +2,27 @@ import boto3
 from decimal import Decimal
 from datetime import datetime, timedelta
 import json
+import requests
 
 dynamodb = boto3.resource('dynamodb')
 orders_table = dynamodb.Table('pf_ordenes')
 inventory_table = dynamodb.Table('pf_inventario')
 products_table = dynamodb.Table('pf_productos')
+
+def validate_token(token):
+    url = "https://0w7xbgvz6f.execute-api.us-east-1.amazonaws.com/test/token/validate"
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {token}'
+    }
+    try:
+        response = requests.post(url, headers=headers)
+        if response.status_code == 200:
+            return response.json() 
+        else:
+            raise Exception(response.json().get('error', 'Token no válido'))
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"Error en la validación del token: {str(e)}")
 
 def search_product(tenant_id, product_id=None, product_name=None):
     try:
@@ -81,7 +97,19 @@ def update_inventory(tenant_id, inventory_id, product_id, cantidad, observacione
 
 def lambda_handler(event, context):
     try:
-        print("Evento recibido:", event)
+        token = event.get('headers', {}).get('Authorization', '').split(' ')[1] if 'Authorization' in event.get('headers', {}) else None
+        if not token:
+            return {
+                'statusCode': 400,
+                'body': { "message": "Token is required" }
+            }
+        try:
+            validate_token(token)
+        except Exception as error:
+            return {
+                'statusCode': 403,
+                'body': { "message": str(error) }
+            }
         
         body = json.loads(event['body']) if isinstance(event['body'], str) else event['body']
         tenant_id = body['tenant_id']
