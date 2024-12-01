@@ -3,6 +3,9 @@ const { DynamoDBDocumentClient, DeleteCommand } = require("@aws-sdk/lib-dynamodb
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
+
+const https = require('https');
+
 const validateToken = (token) => {
   return new Promise((resolve, reject) => {
     const options = {
