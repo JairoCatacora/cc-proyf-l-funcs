@@ -18,13 +18,13 @@ exports.handler = async () => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify(tenantLogos)
+            body: tenantLogos
         };
     } catch (error) {
         console.error('Error listing logos:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Error retrieving tenant logos' })
+            body: { error: 'Error retrieving tenant logos' }
         };
     }
 };
