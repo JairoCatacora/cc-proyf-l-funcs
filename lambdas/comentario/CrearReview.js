@@ -30,14 +30,14 @@ exports.lambda_handler = async (event) => {
     return {
       statusCode: 201,
       body: {
-        message: "Inventory created successfully",
+        message: "review created successfully",
       },
     };
   } catch (error) {
     return {
       statusCode: 500,
       body: {
-        error: error.message || "An error occurred while creating the inventory",
+        error: error.message || "An error occurred while creating the review",
       },
     };
   }

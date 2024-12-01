@@ -1,9 +1,10 @@
-const https = require("https");
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
+
+const https = require("https");
 
 const validateToken = (token) => {
   return new Promise((resolve, reject) => {
@@ -18,29 +19,31 @@ const validateToken = (token) => {
 
     const req = https.request(options, (res) => {
       let data = "";
+
       res.on("data", (chunk) => {
         data += chunk;
       });
 
       res.on("end", () => {
         try {
-          const parsedData = JSON.parse(data);
+          const response = JSON.parse(data);
           if (res.statusCode === 200) {
-            resolve(parsedData); 
+            resolve(response); // Token válido
           } else {
-            reject(new Error(parsedData.body || "Token inválido o expirado"));
+            reject(new Error(response.error || "Token no válido"));
           }
         } catch (err) {
-          reject(err);
+          reject(new Error("Error al procesar la respuesta de validación del token"));
         }
       });
     });
 
     req.on("error", (err) => {
-      reject(err);
+      reject(new Error(`Error al realizar la solicitud de validación: ${err.message}`));
     });
 
-    req.write(JSON.stringify({ token }));
+    const body = JSON.stringify({ token });
+    req.write(body);
     req.end();
   });
 };
@@ -67,8 +70,8 @@ exports.lambda_handler = async (event) => {
       };
     }
 
-    const tenant_id = event.query.tenant_id;
-    const user_id = event.query.user_id;
+    const tenant_id = event.queryStringParameters?.tenant_id;
+    const user_id = event.queryStringParameters?.user_id;
 
     if (!tenant_id || !user_id) {
       return {
@@ -97,7 +100,7 @@ exports.lambda_handler = async (event) => {
     } else {
       return {
         statusCode: 404,
-        body: { message: "No inventory found" },
+        body: { message: "No comments found" },
       };
     }
   } catch (error) {

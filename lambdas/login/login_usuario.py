@@ -1,54 +1,67 @@
 import boto3
 import hashlib
-import uuid # Genera valores únicos
+import uuid
 from datetime import datetime, timedelta
+import json
 
-# Hashear contraseña
 def hash_password(password):
-    # Retorna la contraseña hasheada
     return hashlib.sha256(password.encode()).hexdigest()
 
 def lambda_handler(event, context):
-    print(event)
+    tenant_id = ['body']['tenant_id']
+    user_id = ['body']['user_id']
+    password = ['body']['password']
 
-    tenant_id = event['body']['tenant_id']
-    user_id = event['body']['user_id']
-    password = event['body']['password']
-    hashed_password = hash_password(password)
+    if not tenant_id or not user_id or not password:
+        return {
+            'statusCode': 400,
+            'body': {'error': 'Faltan parámetros requeridos'}
+        }
 
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('pf_usuarios')
-    response = table.get_item(
-        Key={
-            'tenant_id': tenant_id,
-            'user_id': user_id
+    user_table = dynamodb.Table('pf_usuarios')
+
+    try:
+        response = user_table.get_item(Key={'tenant_id': tenant_id, 'user_id': user_id})
+        user = response.get('Item')
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': {'error': 'Error al consultar DynamoDB', 'details': str(e)}
         }
-    )
-    if 'Item' not in response:
+
+    if not user:
         return {
             'statusCode': 403,
-            'body': 'Usuario no existe'
+            'body': {'error': 'Usuario no existe'}
         }
-    else:
-        hashed_password_bd = response['Item']['password']
-        if hashed_password == hashed_password_bd:
 
-            token = str(uuid.uuid4())
-            fecha_hora_exp = datetime.now() + timedelta(minutes=60)
-            registro = {
-                'token': token,
-                'expires': fecha_hora_exp.strftime('%Y-%m-%d %H:%M:%S')
-            }
-            table = dynamodb.Table('t_tokens_acceso')
-            dynamodbResponse = table.put_item(Item = registro)
-        else:
-            return {
-                'statusCode': 403,
-                'body': 'Password incorrecto'
-            }
-    
+    hashed_password = hash_password(password)
+    if hashed_password != user['password']:
+        return {
+            'statusCode': 403,
+            'body': {'error': 'Contraseña incorrecta'}
+        }
+
+    token = str(uuid.uuid4())
+    expiration_time = datetime.now() + timedelta(minutes=60)
+    token_item = {
+        'token': token,
+        'tenant_id': tenant_id,
+        'user_id': user_id,
+        'expires': expiration_time.strftime('%Y-%m-%d %H:%M:%S')
+    }
+
+    token_table = dynamodb.Table('t_tokens_acceso')
+    try:
+        token_table.put_item(Item=token_item)
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': {'error': 'Error al guardar el token', 'details': str(e)}
+        }
 
     return {
         'statusCode': 200,
-        'token': token
+        'body': {'token': token}
     }
