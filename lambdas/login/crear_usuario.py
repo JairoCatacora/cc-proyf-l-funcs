@@ -9,7 +9,6 @@ def lambda_handler(event, context):
         tenant_id = event['body']['tenant_id']
         user_id = event['body']['user_id']
         password = event['body']['password']
-        username = event['body']['username']
         
 
         if user_id and password and username:
@@ -22,8 +21,7 @@ def lambda_handler(event, context):
             usuario = {
                 'tenant_id': tenant_id,
                 'user_id': user_id,
-                'password': hashed_password,
-                'username': username
+                'password': hashed_password
             }
             response = t_usuarios.put_item(Item=usuario)
 
