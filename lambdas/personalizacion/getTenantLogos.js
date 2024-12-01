@@ -2,7 +2,7 @@ const { S3Client, ListObjectsV2Command } = require("@aws-sdk/client-s3");
 const BUCKET_NAME = "dev-multishop-logos";
 const s3 = new S3Client({ region: "us-east-1" });
 
-exports.lambda_handler = async () => {
+exports.handler = async () => {
     try {
         const params = {
             Bucket: BUCKET_NAME,

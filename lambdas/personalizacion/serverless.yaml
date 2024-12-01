@@ -58,7 +58,7 @@ functions:
 
   getTenantLogos:
     runtime: nodejs22.x
-    handler: getTenantLogos.lambda_handler
+    handler: getTenantLogos.handler
     events:
       - http:
           path: /customization/list-logos
