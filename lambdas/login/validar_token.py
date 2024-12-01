@@ -3,8 +3,7 @@ from datetime import datetime
 
 def lambda_handler(event, context):
     # Entrada (json)
-    headers = event.get('headers', {})
-    auth_header = headers.get('Authorization', '')
+    auth_header = event['headers']['Authorization']
     
     if not auth_header or not auth_header.startswith('Bearer '):
         return {
