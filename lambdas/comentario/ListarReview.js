@@ -4,74 +4,64 @@ const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb"
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 
-const https = require("https");
+const https = require('https');
 
 const validateToken = (token) => {
   return new Promise((resolve, reject) => {
     const options = {
-      hostname: "0w7xbgvz6f.execute-api.us-east-1.amazonaws.com",
-      path: "/test/token/validate",
-      method: "POST",
+      hostname: '0w7xbgvz6f.execute-api.us-east-1.amazonaws.com',
+      path: '/test/token/validate',
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, 
       },
     };
 
     const req = https.request(options, (res) => {
-      let data = "";
-
-      res.on("data", (chunk) => {
+      let data = '';
+      res.on('data', (chunk) => {
         data += chunk;
       });
-
-      res.on("end", () => {
-        try {
-          const response = JSON.parse(data);
-          if (res.statusCode === 200) {
-            resolve(response); // Token válido
-          } else {
-            reject(new Error(response.error || "Token no válido"));
-          }
-        } catch (err) {
-          reject(new Error("Error al procesar la respuesta de validación del token"));
+      res.on('end', () => {
+        const response = JSON.parse(data);
+        if (res.statusCode === 200) {
+          resolve(response); 
+        } else {
+          reject(new Error(response.error || 'Token no válido')); 
         }
       });
     });
 
-    req.on("error", (err) => {
-      reject(new Error(`Error al realizar la solicitud de validación: ${err.message}`));
+    req.on('error', (e) => {
+      reject(new Error(`Error en la validación del token: ${e.message}`));
     });
 
-    const body = JSON.stringify({ token });
-    req.write(body);
     req.end();
   });
 };
 
 exports.lambda_handler = async (event) => {
   try {
-    const headers = event.headers || {};
-    const authHeader = headers["Authorization"] || headers["authorization"];
-    if (!authHeader) {
+    const token = event.headers.Authorization?.split(' ')[1]; 
+    if (!token) {
       return {
         statusCode: 400,
-        body: { message: "Authorization header missing or invalid" },
+        body: { message: "Token is required" },
       };
     }
-
-    const token = authHeader.split(" ")[1];
 
     try {
-      await validateToken(token);
-    } catch (err) {
+      await validateToken(token); 
+    } catch (error) {
       return {
         statusCode: 403,
-        body: { message: err.message || "Token validation failed" },
+        body: { message: error.message },
       };
     }
 
-    const tenant_id = event.queryStringParameters?.tenant_id;
-    const user_id = event.queryStringParameters?.user_id;
+    const tenant_id = event.query.tenant_id;
+    const user_id = event.query.user_id;
 
     if (!tenant_id || !user_id) {
       return {
