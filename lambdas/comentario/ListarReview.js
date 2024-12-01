@@ -26,9 +26,9 @@ const validateToken = (token) => {
         try {
           const parsedData = JSON.parse(data);
           if (res.statusCode === 200) {
-            resolve(parsedData);
+            resolve(parsedData); 
           } else {
-            reject(new Error(parsedData.message || "Invalid token"));
+            reject(new Error(parsedData.body || "Token inválido o expirado"));
           }
         } catch (err) {
           reject(err);
@@ -40,7 +40,7 @@ const validateToken = (token) => {
       reject(err);
     });
 
-    req.write({ token });
+    req.write(JSON.stringify({ token }));
     req.end();
   });
 };
