@@ -8,9 +8,6 @@ provider:
   timeout: 30
   iam:
     role: arn:aws:iam::943073974505:role/LabRole
-  environment:
-    ORDERS_TABLE_NAME: pf_ordenes
-    PAYMENTS_TABLE_NAME: pf_pagos
 
 functions:
   crear_pago:
@@ -49,38 +46,3 @@ functions:
           method: delete
           cors: true
           integration: lambda
-
-resources:
-  Resources:
-    PaymentsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.environment.PAYMENTS_TABLE_NAME}
-        AttributeDefinitions:
-          - AttributeName: tenant_id
-            AttributeType: S
-          - AttributeName: pago_id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: tenant_id
-            KeyType: HASH
-          - AttributeName: pago_id
-            KeyType: RANGE
-        BillingMode: PAY_PER_REQUEST
-        GlobalSecondaryIndexes:
-          - IndexName: tenant_id-user_id-index
-            KeySchema:
-              - AttributeName: tenant_id
-                KeyType: HASH
-              - AttributeName: user_id
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-          - IndexName: user_id-pago_id-index
-            KeySchema:
-              - AttributeName: user_id
-                KeyType: HASH
-              - AttributeName: pago_id
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL

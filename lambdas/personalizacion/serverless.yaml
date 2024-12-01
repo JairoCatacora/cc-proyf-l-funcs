@@ -8,11 +8,6 @@ provider:
   timeout: 30
   iam:
     role: arn:aws:iam::943073974505:role/LabRole
-  environment:
-    CUSTOMIZATIONS_TABLE: t_customizations
-    LOGO_BUCKET: dev-multishop-logos
-    BUCKET_NAME: dev-multishop-logos
-
 
 functions:
   getCustomization:
@@ -70,27 +65,3 @@ functions:
           method: get
           cors: true
           integration: lambda
-
-resources:
-  Resources:
-    CustomizationsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.environment.CUSTOMIZATIONS_TABLE}
-        AttributeDefinitions:
-          - AttributeName: tenant_id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: tenant_id
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
-
-    LogoBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:provider.environment.LOGO_BUCKET}
-        PublicAccessBlockConfiguration:
-          BlockPublicAcls: false
-          BlockPublicPolicy: false
-          IgnorePublicAcls: false
-          RestrictPublicBuckets: false
