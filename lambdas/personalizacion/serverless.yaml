@@ -13,7 +13,6 @@ provider:
     LOGO_BUCKET: dev-multishop-logos
     BUCKET_NAME: dev-multishop-logos
 
-
 functions:
   getCustomization:
     handler: getCustomization.lambda_handler
