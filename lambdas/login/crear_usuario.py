@@ -11,7 +11,7 @@ def lambda_handler(event, context):
         password = event['body']['password']
         
 
-        if user_id and password and username:
+        if user_id and password:
 
             hashed_password = hash_password(password)
 
