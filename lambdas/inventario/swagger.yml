@@ -1,0 +1,358 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: API Inventory
+  description: API para administrar inventarios, stock updates, agregar productos, y buscar.
+
+host: "api.inventory.com"
+basePath: "/v1"
+schemes:
+  - https
+paths:
+  /inventory/create:
+    post:
+      summary: Crear nuevo inventario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReq'
+      responses:
+        201:
+          description: Inventory successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateResp'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /inventory/stock/update:
+    patch:
+      summary: Actualizar stock de producto en el inventario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReq'
+      responses:
+        200:
+          description: Stock successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateResp'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /inventory/names:
+    get:
+      summary: Listar todos los nombres de los inventarios
+      parameters:
+        - name: tenant_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Inventories listed successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetNamesResp'
+        404:
+          description: No inventories found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /inventory/stock:
+    get:
+      summary: Obtener stock de producto en el inventario
+      parameters:
+        - name: tenant_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: inventory_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: product_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Stock details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProdsResp'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /inventory/product/add:
+    post:
+      summary: Agregar producto al inventario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostAddReq'
+      responses:
+        201:
+          description: Product successfully added to inventory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostAddResp'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /inventory/products/list:
+    get:
+      summary: Listar todos los productos en el inventario
+      parameters:
+        - name: tenant_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: inventory_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Products listed successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetProdsResp'
+        404:
+          description: No products found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /inventory/product/delete:
+    delete:
+      summary: Eliminar un producto del inventario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteReq'
+      responses:
+        200:
+          description: Product successfully deleted from inventory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResp'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreateReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        inventory_id:
+          type: string
+        inventory_name:
+          type: string
+      required:
+        - tenant_id
+        - inventory_id
+        - inventory_name
+
+    CreateResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Inventory created successfully"
+
+    UpdateReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        inventory_id:
+          type: string
+        product_id:
+          type: string
+        cantidad:
+          type: integer
+        observaciones:
+          type: string
+        add:
+          type: boolean
+      required:
+        - tenant_id
+        - inventory_id
+        - product_id
+        - cantidad
+        - add
+
+    UpdateResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Stock updated successfully"
+        updatedAttributes:
+          type: object
+
+    GetNamesResp:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        inventory_id:
+          type: string
+        inventory_name:
+          type: string
+
+    GetProdsResp:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        inventory_id:
+          type: string
+        product_id:
+          type: string
+        stock:
+          type: integer
+        observaciones:
+          type: string
+
+    PostAddReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        product_id:
+          type: string
+        inventory_id:
+          type: string
+        stock:
+          type: integer
+        observaciones:
+          type: string
+      required:
+        - tenant_id
+        - product_id
+        - inventory_id
+        - stock
+
+    PostAddResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Product successfully added to inventory"
+
+    DeleteReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        inventory_id:
+          type: string
+        product_id:
+          type: string
+      required:
+        - tenant_id
+        - inventory_id
+        - product_id
+
+    DeleteResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Product successfully deleted from inventory"
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "An error occurred"

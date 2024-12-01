@@ -1,0 +1,240 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: API Reviews
+  description: API para gestionar las reviews de productos, crear, update, eliminar, y buscar.
+
+host: "api.comments.com"
+basePath: "/v1"
+schemes:
+  - https
+paths:
+  /comment/create:
+    post:
+      summary: Crear nueva review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReq'
+      responses:
+        201:
+          description: Comment successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateResp'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /comment/update:
+    patch:
+      summary: Actualizar stock de un producto en el inventario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReq'
+      responses:
+        200:
+          description: Comment successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateResp'
+        400:
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /comment/delete:
+    delete:
+      summary: Eliminar comentario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteReq'
+      responses:
+        200:
+          description: Comment successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResp'
+        400:
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /comment/list:
+    get:
+      summary: Listar reviews de user
+      parameters:
+        - name: tenant_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Comments listed successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListarResp'
+        404:
+          description: No comments found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreateReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        product_id:
+          type: string
+        review_id:
+          type: string
+        user_id:
+          type: string
+        comentario:
+          type: string
+        stars:
+          type: integer
+          minimum: 0
+          maximum: 5
+      required:
+        - tenant_id
+        - product_id
+        - review_id
+        - user_id
+        - comentario
+        - stars
+
+    CreateResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Comment created successfully"
+
+    UpdateReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        product_id:
+          type: string
+        review_id:
+          type: string
+        user_id:
+          type: string
+        comentario:
+          type: string
+        stars:
+          type: integer
+      required:
+        - tenant_id
+        - product_id
+        - review_id
+        - user_id
+        - comentario
+        - stars
+
+    UpdateResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Comment updated successfully"
+        updatedAttributes:
+          type: object
+          additionalProperties: true
+
+    ListarResp:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        product_id:
+          type: string
+        review_id:
+          type: string
+        user_id:
+          type: string
+        comentario:
+          type: string
+        stars:
+          type: integer
+        last_modification:
+          type: string
+
+    DeleteReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        product_id:
+          type: string
+        review_id:
+          type: string
+      required:
+        - tenant_id
+        - product_id
+        - review_id
+
+    DeleteResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Comment deleted successfully"
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "An error occurred"

@@ -7,16 +7,15 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::943073974505:role/LabRole
-
+    role:  ${env:LAB_ROLE_ARN}
   environment:
+    CUSTOMIZATIONS_TABLE: t_customizations
+    LOGO_BUCKET: dev-multishop-logos
     BUCKET_NAME: dev-multishop-logos
 
 functions:
-  # GET /customization/{tenant_id}
   getCustomization:
-    runtime: nodejs22.x
-    handler: getCustomization.handler
+    handler: getCustomization.lambda_handler
     events:
       - http:
           path: /customization/{tenant_id}
@@ -24,7 +23,6 @@ functions:
           cors: true
           integration: lambda
 
-  # PATCH /customization/{tenant_id}
   updateCustomization:
     handler: updateCustomization.lambda_handler
     events:
@@ -34,7 +32,6 @@ functions:
           cors: true
           integration: lambda
 
-  # POST /customization
   createCustomization:
     handler: createCustomization.lambda_handler
     events:
@@ -44,10 +41,9 @@ functions:
           cors: true
           integration: lambda
 
-  # DELETE /customization/{tenant_id}
   deleteCustomization:
     runtime: nodejs22.x
-    handler: deleteCustomization.handler
+    handler: deleteCustomization.lambda_handler
     events:
       - http:
           path: /customization/{tenant_id}
@@ -55,10 +51,8 @@ functions:
           cors: true
           integration: lambda
 
-  # POST /customization/upload-logo
   uploadLogo:
     handler: uploadLogo.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /customization/upload-logo
@@ -66,13 +60,36 @@ functions:
           cors: true
           integration: lambda
 
-  # GET /customization/list-logos
   getTenantLogos:
     runtime: nodejs22.x
-    handler: getTenantLogos.handler
+    handler: getTenantLogos.lambda_handler
     events:
       - http:
           path: /customization/list-logos
           method: get
           cors: true
           integration: lambda
+
+resources:
+  Resources:
+    CustomizationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.CUSTOMIZATIONS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: tenant_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tenant_id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    LogoBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.LOGO_BUCKET}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false

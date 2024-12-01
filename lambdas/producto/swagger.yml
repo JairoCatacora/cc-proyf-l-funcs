@@ -1,0 +1,275 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: Product Management API
+  description: API para crear, updatear, buscar, eliminar, y listar productos.
+
+host: "api.productos.com"
+basePath: "/v1"
+schemes:
+  - https
+
+paths:
+  /product/create:
+    post:
+      summary: Crear un nuevo producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearReq'
+      responses:
+        201:
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrearResp'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+
+  /product/update:
+    put:
+      summary: Update un producto existente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReq'
+      responses:
+        200:
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateResp'
+        400:
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /product/search:
+    get:
+      summary: Buscar un producto
+      parameters:
+        - name: tenant_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: product_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: product_name
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: Product found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResp'
+        400:
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /product/delete:
+    delete:
+      summary: Eliminar un producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteReq'
+      responses:
+        200:
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResp'
+        400:
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /product/list:
+    get:
+      summary: Listar todos los productos por tenant
+      parameters:
+        - name: tenant_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResp'
+        400:
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: No products found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CrearReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        product_id:
+          type: string
+        product_name:
+          type: string
+        product_brand:
+          type: string
+        product_info:
+          type: object
+        product_price:
+          type: number
+      required:
+        - tenant_id
+        - product_id
+        - product_name
+        - product_brand
+        - product_price
+
+    CrearResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Product created successfully"
+
+    UpdateReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        product_id:
+          type: string
+        product_name:
+          type: string
+        product_brand:
+          type: string
+        product_info:
+          type: object
+        product_price:
+          type: number
+      required:
+        - tenant_id
+        - product_id
+
+    UpdateResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Product updated successfully"
+        updatedAttributes:
+          type: object
+
+    ProductResp:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        product_id:
+          type: string
+        product_name:
+          type: string
+        product_brand:
+          type: string
+        product_info:
+          type: object
+        product_price:
+          type: number
+
+    DeleteReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        product_id:
+          type: string
+      required:
+        - tenant_id
+        - product_id
+
+    DeleteResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Product deleted successfully"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string

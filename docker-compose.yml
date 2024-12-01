@@ -9,7 +9,7 @@ services:
     environment:
       SWAGGER_JSON: /app/swagger.yaml
     volumes:
-      - ./usuarios/swagger.yaml:/app/swagger.yaml
+      - ./lambdas/login/swagger.yml:/app/swagger.yaml
 
   swagger-productos:
     image: swaggerapi/swagger-ui
@@ -19,7 +19,7 @@ services:
     environment:
       SWAGGER_JSON: /app/swagger.yaml
     volumes:
-      - ./productos/swagger.yaml:/app/swagger.yaml
+      - ./lambdas/producto/swagger.yaml:/app/swagger.yaml
 
 swagger-orden:
     image: swaggerapi/swagger-ui
@@ -29,4 +29,44 @@ swagger-orden:
     environment:
       SWAGGER_JSON: /app/swagger.yaml
     volumes:
-      - ./orden/swagger.yaml:/app/swagger.yaml
+      - ./lambdas/orden/swagger.yaml:/app/swagger.yaml
+
+swagger-comentario:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-comentario
+    ports:
+      - "8084:8080"
+    environment:
+      SWAGGER_JSON: /app/swagger.yaml
+    volumes:
+      - ./lambdas/comentario/swagger.yaml:/app/swagger.yaml
+
+swagger-inventario:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-inventario
+    ports:
+      - "8085:8080"
+    environment:
+      SWAGGER_JSON: /app/swagger.yaml
+    volumes:
+      - ./lambdas/inventario/swagger.yaml:/app/swagger.yaml
+
+  swagger-pagos:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-pagos
+    ports:
+      - "8086:8080"
+    environment:
+      SWAGGER_JSON: /app/swagger.yaml
+    volumes:
+      - ./lambdas/pagos/swagger.yaml:/app/swagger.yaml
+
+  swagger-customizations:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-customizations
+    ports:
+      - "8087:8080"
+    environment:
+      SWAGGER_JSON: /app/swagger.yaml
+    volumes:
+      - ./lambdas/customizations/swagger.yaml:/app/swagger.yaml

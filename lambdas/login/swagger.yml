@@ -1,0 +1,177 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: API usuarios
+  description: API para gestionar usuarios, logins y validar tokens.
+
+host: "api.loginusers.com"
+basePath: "/v1"
+schemes:
+  - https
+paths:
+  /user/register:
+    post:
+      summary: Crear un usuario
+      descripcion: Endpoint para registrar un nuevo usuario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearUserRequest'
+      responses:
+        '200':
+          description: User successfully register
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrearUserResponse'
+                
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /user/login:
+    post:
+      summary: Iniciar sesión
+      description: Endpoint para loguear a un usuario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginReq'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginRes'
+        '403':
+          description: Unauthorized or user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /token/validate:
+    post:
+      summary: Validar token
+      description: Endpoint para validar un token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+
+      responses:
+        '200':
+          description: Token válido.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  body:
+                    type: string
+                    example: "Token válido"
+        '403':
+          description: Token inválido o expirado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  body:
+                    type: string
+                    example: "Token inexistente o expirado"
+
+components:
+  schemas:
+    CrearUserRequest:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+          example: "tenant_01"
+        user_id:
+          type: string
+          example: "user1"
+        username:
+          type: string
+          example: "usernamepro"
+        password:
+          type: string
+          example: "password123"
+      required:
+        - tenant_id
+        - user_id
+        - password
+        - username
+
+    CrearUserResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Usuario registrado exitosamente"
+        user_id:
+          type: string
+
+    LoginReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+          example: "tenant_01"
+        user_id:
+          type: string
+          example: "user1"
+        password:
+          type: string
+          example: "password123"
+      required:
+        - tenant_id
+        - user_id
+        - password
+
+    LoginRes:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "abcdef123456"
+        expires:
+          type: string
+          example: "2024-11-30T23:59:59"
+
+    SuccessResponse:
+      type: object
+      properties:
+        body:
+          type: string
+          example: "Token válido"
+
+    ErrorResponse:
+      type: object
+      properties:
+        body:
+          type: string
+          example: "Token no existe o expirado"

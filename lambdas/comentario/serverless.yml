@@ -1,5 +1,5 @@
 org: fruit
-service: serviciocliente
+service: comentario
 
 provider:
   name: aws
@@ -7,7 +7,9 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::943073974505:role/LabRole
+    role: ${env:LAB_ROLE_ARN}
+  environment:
+    TABLE_NAME: pf_comentario
 
 functions:
   crear_review:
@@ -32,7 +34,7 @@ functions:
     handler: ActualizarReview.lambda_handler
     events:
       - http:
-          path: /review/update
+          path: /comment/update
           method: patch
           cors: true
           integration: lambda
@@ -41,7 +43,34 @@ functions:
     handler: EliminarReview.lambda_handler
     events:
       - http:
-          path: /review/delete
+          path: /comment/delete
           method: delete
           cors: true
           integration: lambda
+
+resources:
+  Resources:
+    CommentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: tenant_id
+            AttributeType: S
+          - AttributeName: pr_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tenant_id
+            KeyType: HASH
+          - AttributeName: pr_id
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: tenant_id-user_id-index
+            KeySchema:
+              - AttributeName: tenant_id
+                KeyType: HASH
+              - AttributeName: user_id
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL

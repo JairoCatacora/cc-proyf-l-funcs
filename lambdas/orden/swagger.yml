@@ -1,0 +1,296 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: API Orden
+  description: API para administrar órdenes, crear, updatear, listar, y obtener.
+
+host: "api.orders.com"
+basePath: "/v1"
+schemes:
+  - https
+paths:
+  /orden/create:
+    post:
+      summary: Crear nueva orden
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreaReq'
+      responses:
+        201:
+          description: Order successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreaResp'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orden/update:
+    patch:
+      summary: Update an order's status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReq'
+      responses:
+        200:
+          description: Order successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateResp'
+        400:
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orden/list:
+    get:
+      summary: Listar órdenes de user
+      parameters:
+        - name: tenant_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Orders listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListResp'
+        400:
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orden/get:
+    get:
+      summary: Obtener orden por user_ID y orden_ID
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: order_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Order retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResp'
+        400:
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /orden/delete:
+    delete:
+      summary: Eliminar una orden y opcionalmente sus pagos asociados
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteReq'
+      responses:
+        200:
+          description: Order and payment (if provided) deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResp'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreaReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        order_id:
+          type: string
+        user_id:
+          type: string
+        user_info:
+          type: object
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product_id:
+                type: string
+              quantity:
+                type: integer
+        inventory_id:
+          type: string
+      required:
+        - tenant_id
+        - order_id
+        - user_id
+        - products
+        - inventory_id
+
+    CreaResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Order created successfully"
+        order_id:
+          type: string
+        total_price:
+          type: number
+
+    UpdateReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        order_id:
+          type: string
+        order_status:
+          type: string
+      required:
+        - tenant_id
+        - order_id
+        - order_status
+
+    UpdateResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Order status updated successfully"
+        updated:
+          type: object
+
+    ListResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Orders listed successfully"
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderResp'
+
+    OrderResp:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        order_id:
+          type: string
+        user_id:
+          type: string
+        user_info:
+          type: object
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product_id:
+                type: string
+              quantity:
+                type: integer
+        total_price:
+          type: number
+        order_status:
+          type: string
+        creation_date:
+          type: string
+        shipping_date:
+          type: string
+
+    DeleteReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        order_id:
+          type: string
+        pago_id:
+          type: string
+      required:
+        - tenant_id
+        - order_id
+
+    DeleteResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Order and payment (if provided) deleted successfully"
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "An error occurred"

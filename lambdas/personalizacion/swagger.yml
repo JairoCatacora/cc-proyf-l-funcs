@@ -1,0 +1,249 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: Customization Management API
+  description: API para administrar personalizaciones del tenant, incluyendo branding y logos.
+
+host: "api.customization.com"
+basePath: "/v1"
+schemes:
+  - https
+paths:
+  /customization/{tenant_id}:
+    get:
+      summary: Retrieve customization details for a tenant
+      parameters:
+        - name: tenant_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Customization retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomResp'
+        404:
+          description: Customization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      summary: Update customization details for a tenant
+      parameters:
+        - name: tenant_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomUpdateReq'
+      responses:
+        200:
+          description: Customization updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomUpdateResp'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete customization for a tenant
+      parameters:
+        - name: tenant_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Customization deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResp'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /customization:
+    post:
+      summary: Create a new customization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomCreateReq'
+      responses:
+        201:
+          description: Customization created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomCreateResp'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /customization/upload-logo:
+    post:
+      summary: Upload a new logo for a tenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoUploadReq'
+      responses:
+        200:
+          description: Logo uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoUploadResp'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /customization/list-logos:
+    get:
+      summary: List all tenant logos
+      responses:
+        200:
+          description: Logos listed successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LogoResp'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CustomCreateReq:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        logo_url:
+          type: string
+        color_palette:
+          type: object
+        currency:
+          type: string
+        timezone:
+          type: string
+      required:
+        - tenant_id
+
+    CustomCreateResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Customization created successfully"
+
+    CustomUpdateReq:
+      type: object
+      properties:
+        logo_url:
+          type: string
+        color_palette:
+          type: object
+        currency:
+          type: string
+        timezone:
+          type: string
+
+    CustomUpdateResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Customization updated successfully"
+
+    CustomResp:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        logo_url:
+          type: string
+        color_palette:
+          type: object
+        currency:
+          type: string
+        timezone:
+          type: string
+
+    DeleteResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Customization deleted successfully"
+
+    LogoUploadReq:
+      type: object
+      properties:
+        file_name:
+          type: string
+        base_64_str:
+          type: string
+
+    LogoUploadResp:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Logo uploaded successfully"
+
+    LogoResp:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+        logo_url:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "An error occurred"

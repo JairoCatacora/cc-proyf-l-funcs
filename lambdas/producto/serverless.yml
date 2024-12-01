@@ -1,5 +1,5 @@
 org: fruit
-service: productos
+service: producto
 
 provider:
   name: aws
@@ -7,12 +7,13 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::943073974505:role/LabRole
+    role: ${env:LAB_ROLE_ARN}
+  environment:
+    PRODUCTS_TABLE_NAME: pf_productos
 
 functions:
   crear_producto:
     handler: CrearProducto.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /product/create
@@ -22,7 +23,6 @@ functions:
 
   listar_productos:
     handler: ListarProductos.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /product/list
@@ -32,7 +32,6 @@ functions:
 
   actualizar_producto:
     handler: ActualizarProducto.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /product/update
@@ -42,7 +41,6 @@ functions:
 
   buscar_producto:
     handler: BuscarProducto.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /product/search
@@ -52,10 +50,27 @@ functions:
 
   eliminar_producto:
     handler: EliminarProducto.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /product/delete
           method: delete
           cors: true
           integration: lambda
+
+resources:
+  Resources:
+    ProductTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: tenant_id
+            AttributeType: S
+          - AttributeName: product_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tenant_id
+            KeyType: HASH
+          - AttributeName: product_id
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST

@@ -4,16 +4,17 @@ service: login
 provider:
   name: aws
   runtime: python3.12	
-  # Default memory size for functions (default: 256MB)
-  memorySize: 256
+  memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::943073974505:role/LabRole
+    role: ${env:LAB_ROLE_ARN}
+  environment:
+    USERS_TABLE_NAME: pf_usuarios
+    TOKENS_TABLE_NAME: t_tokens_acceso
 
 functions:
   crear_usuario:
     handler: crear_usuario.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /user/register
@@ -23,7 +24,6 @@ functions:
 
   login_usuario:
     handler: login_usuario.lambda_handler
-    memorySize: 512
     events:
       - http:
           path: /user/login
@@ -33,10 +33,39 @@ functions:
 
   validar_token:
     handler: validar_token.lambda_handler
-    memorySize: 512
     events:
       - http:
-          path: /user/validate-token
+          path: /token/validate
           method: post
           cors: true
           integration: lambda
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: tenant_id
+            AttributeType: S
+          - AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tenant_id
+            KeyType: HASH
+          - AttributeName: user_id
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+
+    TokensTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TOKENS_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: token
+            AttributeType: S
+        KeySchema:
+          - AttributeName: token
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
