@@ -49,7 +49,7 @@ exports.lambda_handler = async (event) => {
   try {
     const headers = event.headers || {};
     const authHeader = headers["Authorization"] || headers["authorization"];
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader) {
       return {
         statusCode: 400,
         body: { message: "Authorization header missing or invalid" },
