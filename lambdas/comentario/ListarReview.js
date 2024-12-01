@@ -67,8 +67,8 @@ exports.lambda_handler = async (event) => {
       };
     }
 
-    const tenant_id = event.queryStringParameters?.tenant_id;
-    const user_id = event.queryStringParameters?.user_id;
+    const tenant_id = event.query.tenant_id;
+    const user_id = event.query.user_id;
 
     if (!tenant_id || !user_id) {
       return {
