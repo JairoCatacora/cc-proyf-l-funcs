@@ -167,6 +167,7 @@ def lambda_handler(event, context):
             Item={
                 "tenant_id": tenant_id,
                 "order_id": order_id,
+                "tu_id": f"{tenant_id}#{user_id}",
                 "user_id": user_id,
                 "user_info": user_info,
                 "inventory_id": inventory_id,

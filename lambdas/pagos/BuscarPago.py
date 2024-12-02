@@ -34,8 +34,11 @@ def lambda_handler(event, context):
                 'body': { "message": str(error) }
             }
             
+        tenant_id = event['query']['tenant_id']
         user_id = event['query']['user_id']
         pago_id = event['query']['pago_id']
+
+        tu_id = f'{tenant_id}#{user_id}'
 
         if not user_id and not pago_id:
             return {
@@ -47,8 +50,8 @@ def lambda_handler(event, context):
         table = dynamodb.Table('pf_pagos')
 
         response = table.query(
-            IndexName='user_id-pago_id-index',
-            KeyConditionExpression=Key('user_id').eq(user_id) & Key('pago_id').eq(pago_id)
+            IndexName='tu_id-pago_id-index',
+            KeyConditionExpression=Key('tu_id').eq(tu_id) & Key('pago_id').eq(pago_id)
         )
 
         pagos = response.get('Items', [])

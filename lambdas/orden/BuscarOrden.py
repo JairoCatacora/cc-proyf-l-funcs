@@ -37,8 +37,11 @@ def lambda_handler(event, context):
                 'body': { "message": str(error) }
             }
 
+        tenant_id = event['query']['tenant_id']
         user_id = event['query']['user_id']
         order_id = event['query']['order_id']
+
+        tu_id = f'{tenant_id}#{user_id}'
 
         if not user_id or not order_id:
             return {
@@ -47,8 +50,8 @@ def lambda_handler(event, context):
             }
 
         response = table.query(
-            IndexName='user_id-order_id-index',
-            KeyConditionExpression=Key('user_id').eq(user_id) & Key('order_id').eq(order_id)
+            IndexName='tu_id-order_id-index',
+            KeyConditionExpression=Key('tu_id').eq(tu_id) & Key('order_id').eq(order_id)
         )
 
         return {
