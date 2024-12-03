@@ -7,7 +7,7 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::943073974505:role/LabRole
+    role: arn:aws:iam::851725255627:role/LabRole
 
 functions:
   crear_inventario:
