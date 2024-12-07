@@ -9,8 +9,8 @@ const https = require('https');
 const validateToken = (token) => {
   return new Promise((resolve, reject) => {
     const options = {
-      hostname: '0w7xbgvz6f.execute-api.us-east-1.amazonaws.com',
-      path: '/test/token/validate',
+      hostname: 'i1w2t4axo8.execute-api.us-east-1.amazonaws.com',
+      path: '/prod/token/validate',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ exports.lambda_handler = async (event) => {
 
     const response = await dynamo.send(
       new QueryCommand({
-        TableName: "pf_inventario",
+        TableName: "pf_inventarioprod",
         IndexName: "tenant_id-inventory_id-index",
         KeyConditionExpression: "tenant_id = :tenant_id AND inventory_id = :inventory_id",
         ExpressionAttributeValues: {

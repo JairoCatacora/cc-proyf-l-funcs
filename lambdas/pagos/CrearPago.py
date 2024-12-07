@@ -3,34 +3,34 @@ import json
 from boto3.dynamodb.conditions import Key
 from datetime import datetime
 from decimal import Decimal
-import requests
+import urllib3
 
 dynamodb = boto3.resource('dynamodb')
 table_orders = dynamodb.Table('pf_ordenes')
 table_payments = dynamodb.Table('pf_pagos')
 
 def validate_token(token):
-    url = "https://0w7xbgvz6f.execute-api.us-east-1.amazonaws.com/test/token/validate"
+    url = "https://i1w2t4axo8.execute-api.us-east-1.amazonaws.com/prod/token/validate"
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
     }
-    try:
-        response = requests.post(url, headers=headers)
-        if response.status_code == 200:
-            return response.json() 
-        else:
-            raise Exception(response.json().get('error', 'Token no válido'))
-    except requests.exceptions.RequestException as e:
-        raise Exception(f"Error en la validación del token: {str(e)}")
+    http = urllib3.PoolManager()
+    response = http.request("POST", url, headers=headers)
+    
+    if response.status == 200:
+        return json.loads(response.data.decode('utf-8'))
+    else:
+        error_msg = json.loads(response.data.decode('utf-8')).get('error', 'Token no válido')
+        raise Exception(error_msg)
 
 def search_order(user_id, order_id):
     if not user_id or not order_id:
         raise ValueError("user_id y order_id son requeridos.")
     
     response = table_orders.query(
-        IndexName='user_id-order_id-index',
-        KeyConditionExpression=Key('user_id').eq(user_id) & Key('order_id').eq(order_id)
+        IndexName='tu_id-order_id-index',
+        KeyConditionExpression=Key('tu_id').eq(tu_id) & Key('order_id').eq(order_id)
     )
     
     if not response.get('Items'):
@@ -75,6 +75,8 @@ def lambda_handler(event, context):
         order_id = event['body']['order_id']
         user_id = event['body']['user_id']
         user_info = event['body']['user_info']
+
+        tu_id = f'{tenant_id}#{user_id}'
 
         fecha_pago = datetime.utcnow().isoformat()
 
