@@ -24,9 +24,9 @@ def validate_token(token):
         error_msg = json.loads(response.data.decode('utf-8')).get('error', 'Token no válido')
         raise Exception(error_msg)
 
-def search_order(user_id, order_id):
-    if not user_id or not order_id:
-        raise ValueError("user_id y order_id son requeridos.")
+def search_order(tu_id, order_id):
+    if not tu_id or not order_id:
+        raise ValueError("tu_id y order_id son requeridos.")
     
     response = table_orders.query(
         IndexName='tu_id-order_id-index',
@@ -51,20 +51,21 @@ def update_order(tenant_id, order_id, order_status):
         ReturnValues="UPDATED_NEW"
     )
     return response['Attributes']
+
 def lambda_handler(event, context):
     try:
         token = event.get('headers', {}).get('Authorization', '').split(' ')[1] if 'Authorization' in event.get('headers', {}) else None
         if not token:
             return {
                 'statusCode': 400,
-                'body': { "message": "Token is required" }
+                'body': json.dumps({ "message": "Token is required" })
             }
         try:
             validate_token(token)
         except Exception as error:
             return {
                 'statusCode': 403,
-                'body': { "message": str(error) }
+                'body': json.dumps({ "message": str(error) })
             }
 
         if isinstance(event['body'], str):
@@ -77,11 +78,10 @@ def lambda_handler(event, context):
         user_info = event['body']['user_info']
 
         tu_id = f'{tenant_id}#{user_id}'
-
         fecha_pago = datetime.utcnow().isoformat()
 
         try:
-            order_data = search_order(user_id, order_id)
+            order_data = search_order(tu_id, order_id)
         except ValueError as e:
             return {
                 'statusCode': 404,
@@ -94,9 +94,9 @@ def lambda_handler(event, context):
             Item={
                 'tenant_id': tenant_id,
                 'pago_id': pago_id, 
-                "tu_id": f"{tenant_id}#{user_id}",
+                'tu_id': tu_id,
                 'order_id': order_id,
-                'user_id' : user_id,
+                'user_id': user_id,
                 'total': total,
                 'fecha_pago': fecha_pago,
                 'user_info': user_info
