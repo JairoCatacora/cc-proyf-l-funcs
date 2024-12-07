@@ -58,14 +58,14 @@ def lambda_handler(event, context):
         if not token:
             return {
                 'statusCode': 400,
-                'body': json.dumps({ "message": "Token is required" })
+                'body': { "message": "Token is required" }
             }
         try:
             validate_token(token)
         except Exception as error:
             return {
                 'statusCode': 403,
-                'body': json.dumps({ "message": str(error) })
+                'body': { "message": str(error) }
             }
 
         if isinstance(event['body'], str):
