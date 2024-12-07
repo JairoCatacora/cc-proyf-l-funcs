@@ -54,3 +54,13 @@ functions:
           method: delete
           cors: true
           integration: lambda
+  
+  get_producto_photo:
+    handler: GetProductoFoto.lambda_handler
+    events:
+      - http:
+          path: /product/foto
+          method: get
+          cors: true
+          integration: lambda
+
