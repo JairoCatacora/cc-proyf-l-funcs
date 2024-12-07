@@ -4,7 +4,7 @@ from boto3.dynamodb.conditions import Key
 import urllib3
 
 def validate_token(token):
-    url = "https://cdy2ifofu6.execute-api.us-east-1.amazonaws.com/prod/token/validate"
+    url = "https://w90866t035.execute-api.us-east-1.amazonaws.com/prod/token/validate"
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'

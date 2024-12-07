@@ -9,7 +9,7 @@ const https = require('https');
 const validateToken = (token) => {
   return new Promise((resolve, reject) => {
     const options = {
-      hostname: 'cdy2ifofu6.execute-api.us-east-1.amazonaws.com',
+      hostname: 'w90866t035.execute-api.us-east-1.amazonaws.com',
       path: '/prod/token/validate',
       method: 'POST',
       headers: {

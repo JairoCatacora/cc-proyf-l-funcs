@@ -10,7 +10,7 @@ table_orders = dynamodb.Table('pf_ordenes')
 table_payments = dynamodb.Table('pf_pagos')
 
 def validate_token(token):
-    url = "https://cdy2ifofu6.execute-api.us-east-1.amazonaws.com/prod/token/validate"
+    url = "https://w90866t035.execute-api.us-east-1.amazonaws.com/prod/token/validate"
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
