@@ -3,6 +3,9 @@ import json
 from boto3.dynamodb.conditions import Key
 import urllib3
 
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('pf_pagos')
+
 def validate_token(token):
     url = "https://bfh1meojk2.execute-api.us-east-1.amazonaws.com/prod/token/validate"
     headers = {
