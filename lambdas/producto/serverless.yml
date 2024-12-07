@@ -7,7 +7,7 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::851725255627:role/LabRole
+    role: arn:aws:iam::687417073285:role/LabRole
 
 functions:
   crear_producto:
