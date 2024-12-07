@@ -2,7 +2,7 @@ import base64
 import boto3
 
 s3_client = boto3.client('s3')
-BUCKET_NAME = 'dev-multishop-logos'
+BUCKET_NAME = 'prod-multishop-logos'
 
 def lambda_handler(event, context):
     try:
