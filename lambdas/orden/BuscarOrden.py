@@ -7,7 +7,7 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('pf_ordenes')
 
 def validate_token(token):
-    url = "https://i1w2t4axo8.execute-api.us-east-1.amazonaws.com/prod/token/validate"
+    url = "https://bfh1meojk2.execute-api.us-east-1.amazonaws.com/prod/token/validate"
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {token}'
