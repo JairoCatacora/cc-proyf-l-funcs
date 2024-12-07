@@ -1,5 +1,5 @@
-org: fruit
-service: productos
+org: flaqq
+service: inventario
 
 provider:
   name: aws
