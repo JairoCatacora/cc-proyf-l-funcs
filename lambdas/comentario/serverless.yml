@@ -45,3 +45,12 @@ functions:
           method: delete
           cors: true
           integration: lambda
+
+  get_review:
+    handler: GetReview.lambda_handler
+    events:
+      - http:
+          path: /comment/get
+          method: get
+          cors: true
+          integration: lambda
