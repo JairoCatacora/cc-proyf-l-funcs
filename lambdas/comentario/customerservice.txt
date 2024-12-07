@@ -1,9 +1,18 @@
+
+
 {
-    "tenant_id": "12345",
-    "order_id": "78910",
-    "product_id": "56789",
-    "user_id": "101112",
-    "review_text": "The product was excellent, very high quality and exactly as described!",
-    "rating": 5,
-    "review_type": "product_review"
+    "statusCode": 200,
+    "body": [
+        {
+            "tenant_id": "uwu",
+            "pr_id":"product_19647#review_0001"
+            "product_id": "product_19647",
+            "review_id":"review_0001",
+            "user_id": "renate",
+            "comentario": "The product was excellent, very high quality and exactly as described!",
+            "stars": 5,
+            "review_type": "product_review"
+            "last_modification":"2024-07-17"
+        }
+    ]
 }

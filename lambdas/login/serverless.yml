@@ -1,4 +1,4 @@
-org: flaqq
+org: sofkp
 service: login
 
 provider:
@@ -7,7 +7,7 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::975050197903:role/LabRole
+    role: arn:aws:iam::322906775818:role/LabRole
 
 functions:
   crear_usuario:
